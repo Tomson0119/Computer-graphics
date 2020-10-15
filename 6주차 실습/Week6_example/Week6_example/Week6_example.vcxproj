@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{B20E889F-0748-4259-9710-AE9F80603A79}</ProjectGuid>
-    <RootNamespace>week5example910</RootNamespace>
+    <ProjectGuid>{F01534FD-DB3B-4FD5-B90F-E7C4CC8AE7E2}</ProjectGuid>
+    <RootNamespace>Week6example</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -79,7 +79,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalOptions>freeglut.lib glew32.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -125,25 +124,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="example.h" />
-    <ClInclude Include="second_example.h" />
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="third_example.h" />
-    <ClInclude Include="triangle.h" />
-    <ClInclude Include="util.h" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="cube.cpp" />
     <ClCompile Include="example.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="second_example.cpp" />
+    <ClCompile Include="pyramid.cpp" />
     <ClCompile Include="shader.cpp" />
-    <ClCompile Include="third_example.cpp" />
     <ClCompile Include="triangle.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="vertexarray.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cube.h" />
+    <ClInclude Include="example.h" />
+    <ClInclude Include="line.h" />
+    <ClInclude Include="object.h" />
+    <ClInclude Include="pyramid.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="triangle.h" />
+    <ClInclude Include="util.h" />
+    <ClInclude Include="vertexarray.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />
     <None Include="vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="cube.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

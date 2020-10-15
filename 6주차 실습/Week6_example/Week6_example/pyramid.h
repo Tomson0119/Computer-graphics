@@ -6,14 +6,9 @@
 class Pyramid : public Object
 {
 private:
-	float* vPos;
-	float* vColor;
-	unsigned int* vIndex;
-
-	const float hSize = 0.2f;
-
-	const unsigned int vNum = 15;
-	const unsigned int iNum = 18;
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> colors;
+	std::vector<unsigned int> indices;
 
 	VertexArray* vertexArray;
 

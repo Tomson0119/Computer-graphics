@@ -3,25 +3,21 @@
 
 Pyramid::Pyramid()
 {
-	vPos = new float[vNum]
-	{
-		 0.0f,   hSize,  0.0f,
-		-hSize, -hSize,  hSize,
-		 hSize, -hSize,  hSize,
-		-hSize, -hSize, -hSize,
-		 hSize, -hSize, -hSize
-	};
+	const float hSize = 0.2f;
 
-	vColor = new float[vNum]
-	{
-		0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f
-	};
+	vertices.emplace_back(glm::vec3(0.0f, hSize, 0.0f));
+	vertices.emplace_back(glm::vec3(-hSize, -hSize, hSize));
+	vertices.emplace_back(glm::vec3(hSize, -hSize, hSize));
+	vertices.emplace_back(glm::vec3(-hSize, -hSize, -hSize));
+	vertices.emplace_back(glm::vec3(hSize, -hSize, -hSize));
 
-	vIndex = new unsigned int[iNum]
+	colors.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	colors.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	colors.emplace_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	colors.emplace_back(glm::vec3(0.0f, 1.0f, 1.0f));
+	colors.emplace_back(glm::vec3(1.0f, 1.0f, 0.0f));
+
+	unsigned int vIndex[]
 	{
 		0, 1, 2,
 		0, 2, 4,
@@ -31,24 +27,28 @@ Pyramid::Pyramid()
 		2, 3, 4
 	};
 
+	for (unsigned int i = 0; i < sizeof(vIndex) / sizeof(*vIndex); i++)
+		indices.emplace_back(vIndex[i]);
+
 	vertexArray = nullptr;
 }
 
 Pyramid::~Pyramid()
 {
-	delete vPos;
-	delete vColor;
-	delete vIndex;
+	std::vector<glm::vec3>().swap(vertices);
+	std::vector<glm::vec3>().swap(colors);
+	std::vector<unsigned int>().swap(indices);
+
 	delete vertexArray;
 }
 
 void Pyramid::setVertexArray()
 {
-	vertexArray = new VertexArray(vPos, vColor, vIndex, vNum, iNum);
+	vertexArray = new VertexArray(vertices, colors, indices);
 }
 
 void Pyramid::draw()
 {
 	vertexArray->setActive();
-	glDrawElements(GL_TRIANGLES, iNum, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

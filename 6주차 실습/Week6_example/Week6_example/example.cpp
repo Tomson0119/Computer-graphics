@@ -19,9 +19,10 @@ Example::Example()
 	objs.emplace_back(new Line("x"));
 	objs.emplace_back(new Line("y"));
 	objs.emplace_back(new Cube());
-	objs.emplace_back(new Pyramid());
 
-	curObj = objs.at(2);
+	curObj = objs.at(objs.size() - 1);
+
+	objs.emplace_back(new Pyramid());	
 
 	transformMat = glm::mat4(1.0f);
 }
@@ -30,8 +31,7 @@ Example::~Example()
 {
 	for (auto object : objs)
 		delete object;
-	objs.clear();
-	objs.shrink_to_fit();
+	std::vector<Object*>().swap(objs);
 
 	delete shader;
 }

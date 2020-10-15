@@ -1,6 +1,10 @@
 #pragma once
 
+#include <vector>
+
+#include <glm/glm.hpp>
 #include <gl/glew.h>
+
 
 class VertexArray
 {
@@ -10,13 +14,16 @@ private:
 	GLuint IBO;
 
 public:
-	VertexArray(float* vPos, float* vColor, unsigned int* vIndex,
-		unsigned int vSize, unsigned int iSize);
+	VertexArray(const std::vector<glm::vec3>& vertices,
+				const std::vector<glm::vec3>& colors,
+				const std::vector<unsigned int>& indices);
+
 	~VertexArray();
 
 	void setActive();
 
 private:
-	void set_buffer(float* vPos, float* vColor, unsigned int* vIndex,
-		unsigned int vSize, unsigned int iSize);
+	void set_buffer(const std::vector<glm::vec3>& vertices,
+					const std::vector<glm::vec3>& colors,
+					const std::vector<unsigned int>& indices);
 };

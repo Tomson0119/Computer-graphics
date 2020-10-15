@@ -1,8 +1,9 @@
 #pragma once
 
+#include "object.h"
 #include "vertexarray.h"
 
-class Line
+class Line : public Object
 {
 private:
 	float* vPos;
@@ -38,16 +39,16 @@ public:
 		vertexArray = nullptr;
 	}
 
-	~Line() {
+	~Line() override {
 		delete vertexArray;
 	}
 
-	void setVertexArray()
+	void setVertexArray() override
 	{
 		vertexArray = new VertexArray(vPos, vColor, index, vNum, iNum);
 	}
 
-	void draw()
+	void draw() override
 	{
 		vertexArray->setActive();
 		glDrawElements(GL_LINE_LOOP, iNum, GL_UNSIGNED_INT, nullptr);

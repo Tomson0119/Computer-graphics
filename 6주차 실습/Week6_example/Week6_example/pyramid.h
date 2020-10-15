@@ -19,7 +19,7 @@ private:
 
 public:
 	Pyramid();
-	~Pyramid();
+	~Pyramid() override;
 
 	void setVertexArray() override;
 	void draw() override;

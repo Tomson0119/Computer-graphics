@@ -16,7 +16,7 @@ GLvoid key_event(unsigned char key, int x, int y);
 GLvoid mouse_event(int button, int state, int x, int y);
 GLvoid setTimer(int value);
 GLvoid special_key_down(int key, int x, int y);
-GLvoid special_key_up(int key, int x, int y);
+
 
 int main(int argc, char** argv)
 {
@@ -34,7 +34,6 @@ int main(int argc, char** argv)
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(key_event);
 	glutSpecialFunc(special_key_down);
-	glutSpecialUpFunc(special_key_up);
 	glutTimerFunc(16, setTimer, 1);
 
 	glutMainLoop();
@@ -77,10 +76,6 @@ GLvoid setTimer(int value)
 
 GLvoid special_key_down(int key, int x, int y)
 {
-	
-}
-
-GLvoid special_key_up(int key, int x, int y)
-{
-	
+	example.special_key(key, x, y);
+	glutPostRedisplay();
 }

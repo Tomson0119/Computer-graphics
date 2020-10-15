@@ -15,8 +15,8 @@ class Example
 {
 private:
 	Shader* shader;
-	std::vector<Line*> lines;
 	std::vector<Object*> objs;
+	Object* curObj;
 
 	glm::mat4 transformMat;
 
@@ -26,7 +26,11 @@ private:
 	float rotate_x;
 	float rotate_y;
 
+	float move_x;
+	float move_y;
+
 	const float rotate_speed = 5.0f;
+	const float move_dist = 0.02f;
 
 	unsigned int polygon_mode;
 
@@ -38,7 +42,9 @@ public:
 
 	void draw();
 	void key_event(unsigned char key, int x, int y);
+	void special_key(int key, int x, int y);
 	void mouse_event(int button, int state, int x, int y);
+	
 	bool setTimer();
 
 private:

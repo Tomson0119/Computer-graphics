@@ -11,23 +11,23 @@
 
 Example::Example()
 	:angle_x(30.0f), angle_y(-30.0f),
-	 rotate_x(0.0f), rotate_y(0.0f), polygon_mode(GL_FILL)
+	 rotate_x(0.0f), rotate_y(0.0f), 
+	 move_x(0.0f), move_y(0.0f), polygon_mode(GL_FILL)
 {
 	shader = new Shader();
-	lines.emplace_back(new Line("x"));
-	lines.emplace_back(new Line("y"));
 
+	objs.emplace_back(new Line("x"));
+	objs.emplace_back(new Line("y"));
+	objs.emplace_back(new Cube());
 	objs.emplace_back(new Pyramid());
+
+	curObj = objs.at(2);
+
 	transformMat = glm::mat4(1.0f);
 }
 
 Example::~Example()
 {
-	for (auto p : lines)
-		delete p;
-	lines.clear();
-	lines.shrink_to_fit();
-
 	for (auto object : objs)
 		delete object;
 	objs.clear();
@@ -52,9 +52,6 @@ void Example::init_shader()
 
 void Example::init_vertexArray()
 {
-	for (unsigned int i = 0; i < lines.size(); i++)
-		lines.at(i)->setVertexArray();
-
 	for (unsigned int i = 0; i < objs.size(); i++)
 		objs.at(i)->setVertexArray();
 }
@@ -62,17 +59,20 @@ void Example::init_vertexArray()
 void Example::draw()
 {
 	shader->use_program();
-
-	transformMat = glm::mat4(1.0f);
-	shader->setMatTransform("transform", transformMat);
-	for (unsigned int i = 0; i < lines.size(); i++)
-		lines.at(i)->draw();
-
-	transformMat = glm::rotate(transformMat, glm::radians(angle_x), glm::vec3(1.0f, 0.0f, 0.0f));
-	transformMat = glm::rotate(transformMat, glm::radians(angle_y), glm::vec3(0.0f, 1.0f, 0.0f));
-	shader->setMatTransform("transform", transformMat);
-	for (unsigned int i = 0; i < objs.size(); i++)
-		objs.at(i)->draw();
+	 
+	{ // Lines
+		transformMat = glm::mat4(1.0f);
+		shader->setMatTransform("transform", transformMat);
+		for (unsigned int i = 0; i < 2; i++)
+			objs.at(i)->draw();
+	}
+	{ // Object
+		transformMat = glm::translate(transformMat, glm::vec3(move_x, move_y, 0.0f));
+		transformMat = glm::rotate(transformMat, glm::radians(angle_x), glm::vec3(1.0f, 0.0f, 0.0f));
+		transformMat = glm::rotate(transformMat, glm::radians(angle_y), glm::vec3(0.0f, 1.0f, 0.0f));
+		shader->setMatTransform("transform", transformMat);
+		curObj->draw();
+	}
 }
 
 void Example::key_event(unsigned char key, int x, int y)
@@ -117,13 +117,32 @@ void Example::key_event(unsigned char key, int x, int y)
 		rotate_y = 0.0f;
 		break;
 	case 'c':
-		
+		curObj = objs.at(2);
 		break;
 	case 'p':
-		
+		curObj = objs.at(3);
 		break;
 	}
 
+}
+
+void Example::special_key(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		move_x -= move_dist;
+		break;
+	case GLUT_KEY_RIGHT:
+		move_x += move_dist;
+		break;
+	case GLUT_KEY_UP:
+		move_y += move_dist;
+		break;
+	case GLUT_KEY_DOWN:
+		move_y -= move_dist;
+		break;
+	}
 }
 
 void Example::mouse_event(int button, int state, int x, int y)

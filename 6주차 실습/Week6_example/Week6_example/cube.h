@@ -19,7 +19,7 @@ private:
 
 public:
 	Cube();
-	~Cube();
+	~Cube() override;
 
 	void setVertexArray() override;
 	void draw() override;

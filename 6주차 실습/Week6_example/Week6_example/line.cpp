@@ -4,8 +4,8 @@ Line::Line(const char* type)
 {
 	if (type == "x")
 	{
-		vertices.emplace_back(glm::vec3(-1.0f, 0.0f, 0.5f));
-		vertices.emplace_back(glm::vec3(1.0f, 0.0f, 0.5f));
+		vertices.emplace_back(glm::vec3(-10.0f, 0.0f, 0.5f));
+		vertices.emplace_back(glm::vec3(10.0f, 0.0f, 0.5f));
 	}
 	else if (type == "y")
 	{
@@ -14,8 +14,8 @@ Line::Line(const char* type)
 	}
 	else
 	{
-		vertices.emplace_back(glm::vec3(0.0f, 0.0f, -1.0f));
-		vertices.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
+		vertices.emplace_back(glm::vec3(0.0f, 0.0f, -10.0f));
+		vertices.emplace_back(glm::vec3(0.0f, 0.0f, 10.0f));
 	}
 
 	colors.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -41,8 +41,9 @@ void Line::setVertexArray()
 	vertexArray = new VertexArray(vertices, colors, indices);
 }
 
-void Line::draw()
+void Line::draw(Shader* shader)
 {
+	shader->setMatTransform("transform", getTransformMat());
 	vertexArray->setActive();
 	glDrawElements(GL_LINE_LOOP, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

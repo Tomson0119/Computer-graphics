@@ -59,8 +59,9 @@ void Cube::setVertexArray()
 	vertexArray = new VertexArray(vertices, colors, indices);
 }
 
-void Cube::draw()
+void Cube::draw(Shader* shader)
 {
+	shader->setMatTransform("transform", getTransformMat());
 	vertexArray->setActive();
 	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

@@ -36,9 +36,6 @@
     <ClCompile Include="pyramid.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="sphere.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="line.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -66,9 +63,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="pyramid.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="sphere.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

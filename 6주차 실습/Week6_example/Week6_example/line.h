@@ -17,5 +17,5 @@ public:
 	~Line() override;
 
 	void setVertexArray() override;
-	void draw() override;
+	void draw(Shader* shader) override;
 };

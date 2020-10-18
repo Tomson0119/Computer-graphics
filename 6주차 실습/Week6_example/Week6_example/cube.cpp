@@ -61,7 +61,8 @@ void Cube::setVertexArray()
 
 void Cube::draw(Shader* shader)
 {
-	shader->setMatTransform("transform", getTransformMat());
+	shader->setViewTransform(getViewTransformMat());
+	shader->setWorldTransform(getWorldTransformMat());
 	vertexArray->setActive();
 	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

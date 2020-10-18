@@ -12,6 +12,9 @@ Shader::Shader()
 	program = NULL;
 	vertexShader = NULL;
 	fragmentShader = NULL;
+
+	worldLocation = NULL;
+	viewLocation = NULL;
 }
 
 Shader::~Shader()
@@ -42,10 +45,16 @@ bool Shader::make_shader(const std::string& vPath, const std::string& fPath)
 	return true;	
 }
 
-void Shader::setMatTransform(const std::string& name, const glm::mat4& mat)
+void Shader::setWorldTransform(const glm::mat4& mat)
 {
-	GLuint location = glGetUniformLocation(program, name.c_str());
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
+	worldLocation = glGetUniformLocation(program, "worldTransform");
+	glUniformMatrix4fv(worldLocation, 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+void Shader::setViewTransform(const glm::mat4& mat)
+{
+	viewLocation = glGetUniformLocation(program, "viewTransform");
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void Shader::use_program()

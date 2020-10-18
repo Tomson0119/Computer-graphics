@@ -14,7 +14,7 @@ Example::Example()
 	 cube_y(0.0f), pyramid_y(0.0f),
 	 rotate_x(0.0f), rotate_y(0.0f),
 	 move_x(0.0f), move_y(0.0f), 
-	 polygon_mode(GL_FILL), example_scene(1)
+	 polygon_mode(GL_FILL), rotate_mode(WHOLE), example_scene(1)
 {
 	shader = new Shader();
 
@@ -27,6 +27,13 @@ Example::Example()
 	
 	// Initialize curObj
 	curObj = objs.at(objs.size() - 2);
+
+	camera = Camera();
+	viewMat = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.5f),
+		glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	for (unsigned int i = 0; i < objs.size(); i++)
+		objs.at(i)->setViewMat(viewMat);
 }
 
 Example::~Example()
@@ -62,12 +69,12 @@ void Example::sceneOne_draw()
 {
 	{ // Lines
 		for (unsigned int i = 0; i < 2; i++) {
-			objs.at(i)->setMat(glm::mat4(1.0f));
+			objs.at(i)->setWorldMat(glm::mat4(1.0f));
 			objs.at(i)->draw(shader);
 		}
 	}
 	{ // Object
-		curObj->setMat(glm::mat4(1.0f));
+		curObj->setWorldMat(glm::mat4(1.0f));
 		curObj->setMatRotate(angle_x, glm::vec3(1.0f, 0.0f, 0.0f));
 		curObj->setMatRotate(angle_y, glm::vec3(0.0f, 1.0f, 0.0f));
 		curObj->draw(shader);
@@ -77,13 +84,13 @@ void Example::sceneOne_draw()
 void Example::sceneTwo_draw()
 {
 	{ // Lines
-		objs.at(0)->setMat(glm::mat4(1.0f));
+		objs.at(0)->setWorldMat(glm::mat4(1.0f));
 		objs.at(0)->draw(shader);
 	}
 	{ // Object
 		for (unsigned int i = 1; i < objs.size(); i++)
 		{
-			objs.at(i)->setMat(glm::mat4(1.0f));
+			objs.at(i)->setWorldMat(glm::mat4(1.0f));
 
 			objs.at(i)->setMatRotate(angle_x, glm::vec3(1.0f, 0.0f, 0.0f));
 			objs.at(i)->setMatRotate(angle_y, glm::vec3(0.0f, 1.0f, 0.0f));

@@ -63,4 +63,16 @@ private:
 
 	void sceneOne_key_event(unsigned char key, int x, int y);
 	void sceneTwo_key_event(unsigned char key, int x, int y);
+
+private:
+	struct Camera
+	{
+		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 direction = glm::normalize(pos - target);
+		glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
+		glm::vec3 up = glm::normalize(glm::cross(direction, right));
+	};
+	Camera camera;
+	glm::mat4 viewMat;
 };

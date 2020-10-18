@@ -12,13 +12,16 @@ private:
 	GLuint vertexShader;
 	GLuint fragmentShader;
 	
+	GLint worldLocation;
+	GLint viewLocation;
 public:
 	Shader();
 	~Shader();
 
 	bool make_shader(const std::string& vPath, const std::string& fPath);
 	
-	void setMatTransform(const std::string& name, const glm::mat4& mat);
+	void setWorldTransform(const glm::mat4& mat);
+	void setViewTransform(const glm::mat4& mat);
 	void use_program();
 
 private:

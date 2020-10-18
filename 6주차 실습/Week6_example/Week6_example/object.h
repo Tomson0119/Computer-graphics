@@ -13,21 +13,23 @@ public:
 	virtual void setVertexArray() = 0;
 	virtual void draw(Shader* shader) = 0;
 
+	glm::mat4 getViewTransformMat() { return viewTransform; }
+	glm::mat4 getWorldTransformMat() { return worldTransform; }
 
-	glm::mat4 getTransformMat() { return transformMat; }
 
+	void setViewMat(const glm::mat4& mat) { viewTransform = mat; }
+	void setWorldMat(const glm::mat4& mat) { worldTransform = mat; }
 
-	void setMat(const glm::mat4& mat) { transformMat = mat; }
 	void setMatRotate(const float angle, const glm::vec3& vec) 
 	{
-		transformMat = glm::rotate(transformMat, glm::radians(angle), vec); 
+		worldTransform = glm::rotate(worldTransform, glm::radians(angle), vec);
 	}
 	void setMatTranslate(const glm::vec3& vec)
 	{
-		transformMat = glm::translate(transformMat, vec);
+		worldTransform = glm::translate(worldTransform, vec);
 	}
 
 private:
-	glm::mat4 transformMat = glm::mat4(1.0f);
-
+	glm::mat4 viewTransform = glm::mat4(1.0f);
+	glm::mat4 worldTransform = glm::mat4(1.0f);
 };

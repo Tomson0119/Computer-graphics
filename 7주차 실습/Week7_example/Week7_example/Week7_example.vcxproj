@@ -130,8 +130,10 @@
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pyramid.cpp" />
+    <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sphere.cpp" />
+    <ClCompile Include="triangle.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="vertexarray.cpp" />
   </ItemGroup>
@@ -141,8 +143,10 @@
     <ClInclude Include="line.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="pyramid.h" />
+    <ClInclude Include="rectangle.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="sphere.h" />
+    <ClInclude Include="triangle.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="vertexarray.h" />
   </ItemGroup>

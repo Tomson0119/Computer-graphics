@@ -9,18 +9,18 @@ Line::Line(const char* type)
 	if (type == "x" || type == "y" || type == "z") {
 		if (type == "x")
 		{
-			vertices.emplace_back(glm::vec3(-10.0f, 0.0f, 0.5f));
-			vertices.emplace_back(glm::vec3(10.0f, 0.0f, 0.5f));
+			vertices.emplace_back(glm::vec3(-0.5f, 0.0f, 0.0f));
+			vertices.emplace_back(glm::vec3(0.5f, 0.0f, 0.0f));
 		}
 		else if (type == "y")
 		{
-			vertices.emplace_back(glm::vec3(0.0f, -1.0f, 0.5f));
-			vertices.emplace_back(glm::vec3(0.0f, 1.0f, 0.5f));
+			vertices.emplace_back(glm::vec3(0.0f, -0.5f, 0.0f));
+			vertices.emplace_back(glm::vec3(0.0f, 0.5f, 0.0f));
 		}
 		else
 		{
-			vertices.emplace_back(glm::vec3(0.0f, 0.0f, -10.0f));
-			vertices.emplace_back(glm::vec3(0.0f, 0.0f, 10.0f));
+			vertices.emplace_back(glm::vec3(0.0f, 0.0f, -0.5f));
+			vertices.emplace_back(glm::vec3(0.0f, 0.0f, 0.5f));
 		}
 
 		colors.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));

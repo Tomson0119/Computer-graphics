@@ -1,7 +1,6 @@
 #include "util.h"
 #include "example.h"
 
-
 // Basig elements
 Util util = Util(800, 800);
 Example example = Example();

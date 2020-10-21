@@ -14,7 +14,7 @@ private:
 	VertexArray* vertexArray;
 
 public:
-	Cube();
+	Cube(const char* color);
 	~Cube() override;
 
 	void setVertexArray() override;

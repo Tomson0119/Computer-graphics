@@ -25,6 +25,8 @@ Rect::Rect(const char* color)
 				colors.emplace_back(glm::vec3(1.0f, 0.0f, 1.0f));
 			else if (color == "sky")
 				colors.emplace_back(glm::vec3(0.0f, 1.0f, 1.0f));
+			else if(color == "gray")
+				colors.emplace_back(glm::vec3(0.3f, 0.3f, 0.3f));
 			else
 				colors.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
 		}

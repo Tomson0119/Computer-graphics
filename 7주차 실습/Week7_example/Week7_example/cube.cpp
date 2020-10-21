@@ -1,7 +1,7 @@
 #include "cube.h"
 
 
-Cube::Cube()
+Cube::Cube(const char* color)
 {
 	const float hSize = 0.2f;
 
@@ -14,16 +14,26 @@ Cube::Cube()
 		vertices.emplace_back(glm::vec3(-hSize, -hSize, -hSize));
 		vertices.emplace_back(glm::vec3(hSize, hSize, -hSize));
 		vertices.emplace_back(glm::vec3(hSize, -hSize, -hSize));
-
-		colors.emplace_back(glm::vec3(0.0f, 1.0f, 1.0f));
-		colors.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
-		colors.emplace_back(glm::vec3(1.0f, 1.0f, 1.0f));
-		colors.emplace_back(glm::vec3(1.0f, 0.0f, 1.0f));
-		colors.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
-		colors.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		colors.emplace_back(glm::vec3(1.0f, 1.0f, 0.0f));
-		colors.emplace_back(glm::vec3(1.0f, 0.0f, 0.0f));
 	}
+
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		if (color == "red")
+			colors.emplace_back(glm::vec3(1.0f, 0.0f, 0.0f));
+		else if (color == "blue")
+			colors.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
+		else if (color == "green")
+			colors.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
+		else if (color == "yellow")
+			colors.emplace_back(glm::vec3(1.0f, 1.0f, 0.0f));
+		else if (color == "purple")
+			colors.emplace_back(glm::vec3(1.0f, 0.0f, 1.0f));
+		else if (color == "sky")
+			colors.emplace_back(glm::vec3(0.0f, 1.0f, 1.0f));
+		else
+			colors.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	}
+
 
 	unsigned int vIndex[]
 	{

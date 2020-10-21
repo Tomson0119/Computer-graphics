@@ -3,22 +3,27 @@
 #include "sphere.h"
 #include "triangle.h"
 #include "rectangle.h"
-
+#include "cube.h"
 
 #include <iostream>
 
 #include <gl/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 
 Example::Example()
-	: angle(0.0f), polygon_mode(GL_FILL), 
-	  example_scene(1), project_mode(0),
-	  rotate(0.0f), orbit(0.0f), small_orbit(0.0f),
-	  up_rotate(0.0f), front_rotate(0.0f),
-	  up_angle(0.0f), front_angle(0.0f),
-	  window_w(0), window_h(0), draw_mode(0)
+	: angle(0.0f), polygon_mode(GL_FILL),
+	example_scene(3), project_mode(0),
+	rotate(0.0f), orbit(0.0f), small_orbit(0.0f),
+	up_rotate(0.0f), front_rotate(0.0f),
+	up_angle(0.0f), front_angle(0.0f),
+	bottom_angle(0.0f), bottom_rotate(0.0f),
+	mid_angle(0.0f), mid_rotate(0.0f),
+	top_angle(0.0f), top_rotate(0.0f),
+	move(0.0f), move_x(0.0f),
+	window_w(0), window_h(0), draw_mode(0)
 {
 	shader = new Shader();
 
@@ -27,7 +32,7 @@ Example::Example()
 
 	{ // Insert Object For Example 1
 		// Big Orbits 0 ~ 2
-		objs.emplace_back(new Line("circle")); 
+		objs.emplace_back(new Line("circle"));
 		objs.emplace_back(new Line("circle"));
 		objs.emplace_back(new Line("circle"));
 
@@ -71,6 +76,14 @@ Example::Example()
 		objs.emplace_back(new Triangle("blue"));
 		objs.emplace_back(new Triangle("purple"));
 	}
+
+	{ // Insert Crane Objects
+		crane.emplace_back(new Rect("gray"));
+		crane.emplace_back(new Cube("red"));
+		crane.emplace_back(new Cube("yellow"));
+		crane.emplace_back(new Cube("sky"));
+		crane.emplace_back(new Cube("sky"));
+	}
 }
 
 Example::~Example()
@@ -78,6 +91,10 @@ Example::~Example()
 	for (auto object : objs)
 		delete object;
 	std::vector<Object*>().swap(objs);
+
+	for (auto object : crane)
+		delete object;
+	std::vector<Object*>().swap(crane);
 
 	delete shader;
 }
@@ -178,6 +195,40 @@ void Example::sceneTwo_init()
 	}
 }
 
+void Example::sceneThree_init()
+{
+	// Initialize View Matrix
+	viewMat = glm::lookAt(camera.Position, camera.Direction, camera.Up);
+	viewMat = glm::translate(viewMat, glm::vec3(0.0f, -0.5f, 0.0f));
+
+	// Initialize Projection Matrix
+	projMat = glm::perspective(glm::radians(45.0f),
+		(float)window_w / (float)window_h, 0.1f, 50.0f);
+
+	angle = 0.0f, rotate = 0.0f;
+	bottom_angle = 0.0f, bottom_rotate = 0.0f;
+	mid_angle = 0.0f, mid_rotate = 0.0f;
+	top_angle = 0.0f, top_rotate = 0.0f;
+
+	for (unsigned int i = 0; i < crane.size(); i++)
+		crane.at(i)->setWorldMat(glm::mat4(1.0f));
+
+	crane.at(0)->setWorldTranslate(glm::vec3(0.0f, -0.2f, 0.0f));
+	crane.at(0)->setWorldRotate(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	crane.at(0)->setWorldScale(glm::vec3(10.0f, 10.0f, 10.0f));
+
+	crane.at(1)->setWorldScale(glm::vec3(1.0f, 0.3f, 1.0f));
+	
+	crane.at(2)->setWorldScale(glm::vec3(0.6f, 0.4f, 0.6f));
+	crane.at(2)->setWorldTranslate(glm::vec3(0.0f, 0.3f, 0.0f));
+
+	crane.at(3)->setWorldScale(glm::vec3(0.1f, 0.5f, 0.1f));
+	crane.at(3)->setWorldTranslate(glm::vec3(-0.4f, 0.1f, 0.0f));
+
+	crane.at(4)->setWorldScale(glm::vec3(0.1f, 0.5f, 0.1f));
+	crane.at(4)->setWorldTranslate(glm::vec3(0.4f, 0.1f, 0.0f));
+}
+
 void Example::init(int window_w, int window_h)
 {
 	this->window_w = window_w;
@@ -187,14 +238,19 @@ void Example::init(int window_w, int window_h)
 
 	for (unsigned int i = 0; i < objs.size(); i++)
 		objs.at(i)->setVertexArray();
+	for (unsigned int i = 0; i < crane.size(); i++)
+		crane.at(i)->setVertexArray();
+
 
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);	
 
 	if (example_scene == 1)
 		sceneOne_init();
-	else
+	else if (example_scene == 2)
 		sceneTwo_init();
+	else
+		sceneThree_init();
 }
 
 void Example::sceneOne_draw()
@@ -336,19 +392,75 @@ void Example::sceneTwo_draw()
 	}
 }
 
+void Example::sceneThree_draw()
+{	
+	viewMat = glm::lookAt(camera.Position, camera.Position + camera.Direction, camera.Up);
+	viewMat = glm::translate(viewMat, glm::vec3(0.0f, -0.5f, 0.0f));
+
+	shader->setViewTransform(viewMat);
+	shader->setProjTransform(projMat);
+
+	// Idle
+	glm::mat4 mat = glm::mat4(1.0f);
+	mat = glm::rotate(mat, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	shader->setOutWorldTransform(mat);
+	crane.at(0)->draw(shader);
+
+	// Bottom
+	mat = glm::mat4(1.0f);
+	mat = glm::translate(mat, glm::vec3(move, 0.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(bottom_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	shader->setOutWorldTransform(mat);
+	crane.at(1)->draw(shader);
+
+	// Middle
+	mat = glm::mat4(1.0f);
+	mat = glm::translate(mat, glm::vec3(move, 0.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(bottom_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(mid_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	shader->setOutWorldTransform(mat);
+	crane.at(2)->draw(shader);
+
+	// Top-left
+	mat = glm::mat4(1.0f);
+	mat = glm::translate(mat, glm::vec3(move, 0.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(bottom_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(mid_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::translate(mat, glm::vec3(0.0f, 0.25f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(top_angle), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader->setOutWorldTransform(mat);
+	crane.at(3)->draw(shader);
+
+	// Top-right
+	mat = glm::mat4(1.0f);
+	mat = glm::translate(mat, glm::vec3(move, 0.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(bottom_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(mid_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::translate(mat, glm::vec3(0.0f, 0.25f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(-top_angle), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader->setOutWorldTransform(mat);
+	crane.at(4)->draw(shader);
+}
+
 void Example::draw()
 {
 	shader->use_program();
 	
 	if (example_scene == 1)
 		sceneOne_draw();
+	else if (example_scene == 2)
+		sceneTwo_draw();
 	else
-		sceneTwo_draw();	
+		sceneThree_draw();
 }
 
 void Example::key_event(unsigned char key, int x, int y)
 {
-	if (key == 27)
+	if (key == 27 || key =='q' || key == 'Q')
 	{
 		glutDestroyWindow(glutGetWindow());
 		exit(0);
@@ -356,8 +468,10 @@ void Example::key_event(unsigned char key, int x, int y)
 
 	if (example_scene == 1)
 		sceneOne_key_event(key, x, y);
-	else
+	else if (example_scene == 2)
 		sceneTwo_key_event(key, x, y);
+	else
+		sceneThree_key_event(key, x, y);
 }
 
 void Example::sceneOne_key_event(unsigned char key, int x, int y)
@@ -468,17 +582,105 @@ void Example::sceneTwo_key_event(unsigned char key, int x, int y)
 	}
 }
 
+void Example::sceneThree_key_event(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	case 'y': case 'Y':
+		if (rotate <= 0.0f)
+			rotate = rotate_speed;
+		else
+			rotate = 0.0f;
+		break;
+	case 'b': case 'B':
+		if (bottom_rotate <= 0.0f)
+			bottom_rotate = rotate_speed;
+		else
+			bottom_rotate = -rotate_speed;
+		break;
+	case 'm': case 'M':
+		if (mid_rotate <= 0.0f)
+			mid_rotate = rotate_speed;
+		else
+			mid_rotate = -rotate_speed;
+		break;
+	case 't': case 'T':
+		if (top_rotate <= 0.0f)
+			top_rotate = rotate_speed;
+		else
+			top_rotate = -rotate_speed;
+		break;
+	case 'g': case 'G':
+		if (move_x <= 0.0f)
+			move_x = move_dist;
+		break;
+	case 's': case 'S':
+		rotate = 0.0f;
+		bottom_rotate = 0.0f;
+		mid_rotate = 0.0f;
+		top_rotate = 0.0f;
+		move_x = 0.0f;
+		break;
+	case 'c': case 'C':
+		angle = 0.0f;
+		bottom_angle = 0.0f;
+		mid_angle = 0.0f;
+		top_angle = 0.0f;
+		move = 0.0f;
+
+		rotate = 0.0f;
+		bottom_rotate = 0.0f;
+		mid_rotate = 0.0f;
+		top_rotate = 0.0f;
+		move_x = 0.0f;
+		break;
+	case 'z': 
+		camera.Position += glm::vec3(0.0f, 0.0f, move_dist);
+		break;
+	case 'Z':
+		camera.Position += glm::vec3(0.0f, 0.0f, -move_dist);
+		break;
+	case 'x':
+		camera.Position += glm::vec3(move_dist, 0.0f, 0.0f);
+		break;
+	case 'X':
+		camera.Position += glm::vec3(-move_dist, 0.0f, 0.0f);
+		break;
+	case 'r': case 'R':
+		camera.Direction = glm::rotate(camera.Direction, glm::radians(3.0f), glm::vec3{ 0.0f, 1.0f, 0.0f });
+		break;
+	case 'w': case 'W':
+		if (polygon_mode == GL_LINE)
+			polygon_mode = GL_FILL;
+		else
+			polygon_mode = GL_LINE;
+		glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
+		break;
+	}
+}
+
 bool Example::setTimer()
 {	
+	// For Every Scene
+	angle += rotate / 2.0f;
+
+	// For Scene 1
 	small_orbit += rotate_speed * 2.0f;
 	orbit += rotate_speed;
-	angle += rotate / 2.0f;
+	
+	// For Scene 2
 	up_angle += up_rotate;
-
 	front_angle += front_rotate;
 	if (draw_mode == 0 && (front_angle >= 90.0f || front_angle < 0.0f)) front_rotate *= -1;
 	else if(draw_mode == 1 && (front_angle <= -120.0f || front_angle > 0.0f)) front_rotate *= -1;
 
+	// For Scene 3
+	bottom_angle += bottom_rotate;
+	mid_angle += mid_rotate;
+	top_angle += top_rotate;
+	if (top_angle >= 90.0f || top_angle <= -90.0f) top_rotate *= -1;
+	move += move_x;
+	if (move >= 1.0f || move <= -1.0f) move_x *= -1;
 
 	return true;
 }

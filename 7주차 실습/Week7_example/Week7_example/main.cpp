@@ -2,7 +2,7 @@
 #include "example.h"
 
 // Basig elements
-Util util = Util(800, 800);
+Util util = Util(1200, 900);
 Example example = Example();
 
 

@@ -32,6 +32,11 @@ private:
 
 	int camera_turn;
 
+	float animation;
+	float increase;
+	float turning;
+
+
 	unsigned int polygon_mode;
 	unsigned int window_w;
 	unsigned int window_h;
@@ -48,14 +53,14 @@ public:
 	bool setTimer();
 
 private:
-	void globalTransform(glm::vec3 trans, float angle, glm::vec3 axis);
+	
 
 private:
 	struct Camera
 	{
 		glm::vec3 Direction = glm::vec3(0.0f, 0.0f, -1.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 Position = glm::vec3(0.0f, 0.2f, 4.0f);
+		glm::vec3 Position = glm::vec3(0.0f, 0.2f, 3.0f);
 	};
 
 	Camera camera = Camera();

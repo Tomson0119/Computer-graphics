@@ -31,7 +31,7 @@ Cube::Cube(const char* color)
 		else if (color == "sky")
 			colors.emplace_back(glm::vec3(0.0f, 1.0f, 1.0f));
 		else if (color == "brown")
-			colors.emplace_back(glm::vec3(1.0f, 0.25f, 0.25f));
+			colors.emplace_back(glm::vec3(0.8f, 0.2f, 0.2f));
 		else
 			colors.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	}

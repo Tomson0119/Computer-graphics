@@ -14,32 +14,73 @@
 Example::Example()
 	: window_w(0), window_h(0), angle(0.0f), camera_turn(0),
 	polygon_mode(GL_LINE), robot(0.0f), robot_rotate(1.0f),
-	move_x(0.0f), move_z(0.0f), way(0.0f), amount(0.01f),
-	move_y(0.0f), jump(0.0f), door(0.0f), door_move(0.0f)
+	move_x(0.0f), move_z(0.8f), way(0.0f), amount(0.01f),
+	move_y(0.0f), jump(0.0f), door(0.0f), door_move(0.0f),
+	animation(0.0f), increase(0.0f), turning(0.0f)
 {
 	shader = new Shader();
 
+	globalMat = glm::mat4(1.0f);
 	viewMat = glm::mat4(1.0f);
 	projMat = glm::mat4(1.0f);
 
-	// Stage
-	objs.push_back(new Rect("red"));
-	objs.push_back(new Rect("yellow"));
-	objs.push_back(new Rect("blue"));
-	objs.push_back(new Rect("green"));
-	objs.push_back(new Rect("purple"));
-	objs.push_back(new Rect("sky"));
+	// Stage 0 ~ 5
+	{
+		objs.push_back(new Rect("red"));
+		objs.push_back(new Rect("yellow"));
+		objs.push_back(new Rect("purple"));
+		objs.push_back(new Rect("gray"));
+		objs.push_back(new Rect("blue"));
+		objs.push_back(new Rect("sky"));
+	}
+	// Robot 6 ~ 12
+	{
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("yellow"));
+		objs.push_back(new Cube("green"));
+		objs.push_back(new Cube("green"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
 
-	// Robot
-	objs.push_back(new Cube("red"));
-	objs.push_back(new Cube("yellow"));
-	objs.push_back(new Cube("green"));
-	objs.push_back(new Cube("green"));
-	objs.push_back(new Cube("red"));
-	objs.push_back(new Cube("red"));
+		// Face
+		objs.push_back(new Cube("brown"));
+	}
+	// Tree 13 ~ 14
+	{ 
+		objs.push_back(new Cube("brown"));
+		objs.push_back(new Sphere("green"));
+	}
+	// Running 15 ~ 25
+	{ 
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Sphere("yellow"));
 
-	// Tree
-	objs.push_back(new Cube("brown"));
+		// Person
+		objs.push_back(new Sphere("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+	}
+	// Bar 26 ~ 34
+	{
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Cube("blue"));
+
+		// Person
+		objs.push_back(new Sphere("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+	}
+	
 }
 
 Example::~Example()
@@ -72,79 +113,130 @@ void Example::init(int window_w, int window_h)
 		(float)window_w / (float)window_h, 0.1f, 50.0f);
 
 	// Initialize Objects
-	for (unsigned int i = 0; i < objs.size(); i++)
-	{
-		if (i == 0)
-		{
-			objs.at(i)->setWorldTranslate(glm::vec3(0.0f, 0.0f, 1.0f));
-			objs.at(i)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
-		}
-		if (i == 1) 
-		{
-			objs.at(i)->setWorldTranslate(glm::vec3(1.0f, 0.0f, 0.0f));
-			objs.at(i)->setWorldRotate(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-			objs.at(i)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
-		}
-		if (i == 2)
-		{
-			objs.at(i)->setWorldTranslate(glm::vec3(-1.0f, 0.0f, 0.0f));
-			objs.at(i)->setWorldRotate(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-			objs.at(i)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
-		}
-		if (i == 3)
-		{
-			objs.at(i)->setWorldTranslate(glm::vec3(0.0f, 0.0f, -1.0f));
-			objs.at(i)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
-		}
-		if (i == 4)
-		{
-			objs.at(i)->setWorldTranslate(glm::vec3(0.0f, 0.5f, 0.0f));
-			objs.at(i)->setWorldRotate(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-			objs.at(i)->setWorldScale(glm::vec3(5.0f, 5.0f, 1.0f));
-		}
-		if (i == 5)
-		{
-			objs.at(i)->setWorldTranslate(glm::vec3(0.0f, -0.5f, 0.0f));
-			objs.at(i)->setWorldRotate(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-			objs.at(i)->setWorldScale(glm::vec3(5.0f, 5.0f, 1.0f));
-		}
-		
+	// Stage
+	{ 
+		objs.at(0)->setWorldTranslate(glm::vec3(0.0f, 0.0f, 1.0f));
+		objs.at(0)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
 
-		if (i == 6)
-		{			
-			objs.at(i)->setWorldScale(glm::vec3(0.2f, 0.2f, 0.2f));
-			objs.at(i)->setWorldTranslate(glm::vec3(0.0f, -1.9f, 0.0f));
-		}
-		if (i == 7 || i == objs.size()-1) {			
-			if (i == objs.size() - 1) {
-				objs.at(i)->setWorldScale(glm::vec3(0.08f, 0.08f, 0.08f));
-				objs.at(i)->setWorldTranslate(glm::vec3(0.0f, -3.9f, 0.08f));
-			}
-			else {
-				objs.at(i)->setWorldScale(glm::vec3(0.1f, 0.1f, 0.1f));
-				objs.at(i)->setWorldTranslate(glm::vec3(0.0f, -3.1f, 0.0f));
-			}
-		}
-		if (i == 8)
-		{
-			objs.at(i)->setWorldScale(glm::vec3(0.06f, 0.2f, 0.06f));
-			objs.at(i)->setWorldTranslate(glm::vec3(-0.2f, -0.2f, 0.0f));
-		}
-		if (i == 9)
-		{
-			objs.at(i)->setWorldScale(glm::vec3(0.06f, 0.2f, 0.06f));
-			objs.at(i)->setWorldTranslate(glm::vec3(0.2f, -0.2f, 0.0f));
-		}
-		if (i == 10)
-		{
-			objs.at(i)->setWorldScale(glm::vec3(0.05f, 0.2f, 0.1f));
-			objs.at(i)->setWorldTranslate(glm::vec3(-1.0f, 0.0f, 0.0f));
-		}
-		if (i == 11)
-		{
-			objs.at(i)->setWorldScale(glm::vec3(0.05f, 0.2f, 0.1f));
-			objs.at(i)->setWorldTranslate(glm::vec3(1.0f, 0.0f, 0.0f));
-		}
+		objs.at(1)->setWorldTranslate(glm::vec3(1.0f, 0.0f, 0.0f));
+		objs.at(1)->setWorldRotate(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		objs.at(1)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
+
+		objs.at(2)->setWorldTranslate(glm::vec3(-1.0f, 0.0f, 0.0f));
+		objs.at(2)->setWorldRotate(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		objs.at(2)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
+
+		objs.at(3)->setWorldTranslate(glm::vec3(0.0f, 0.0f, -1.0f));
+		objs.at(3)->setWorldScale(glm::vec3(5.0f, 2.5f, 1.0f));
+
+		objs.at(4)->setWorldTranslate(glm::vec3(0.0f, 0.5f, 0.0f));
+		objs.at(4)->setWorldRotate(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		objs.at(4)->setWorldScale(glm::vec3(5.0f, 5.0f, 1.0f));
+
+		objs.at(5)->setWorldTranslate(glm::vec3(0.0f, -0.5f, 0.0f));
+		objs.at(5)->setWorldRotate(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		objs.at(5)->setWorldScale(glm::vec3(5.0f, 5.0f, 1.0f));
+	}
+		 
+	// Robot
+	{ 
+		objs.at(6)->setWorldScale(glm::vec3(0.2f, 0.2f, 0.2f));
+		objs.at(6)->setWorldTranslate(glm::vec3(0.0f, -1.9f, 0.0f));
+		
+		objs.at(7)->setWorldScale(glm::vec3(0.1f, 0.1f, 0.1f));
+		objs.at(7)->setWorldTranslate(glm::vec3(0.0f, -3.1f, 0.0f));
+
+		objs.at(8)->setWorldScale(glm::vec3(0.06f, 0.2f, 0.06f));
+		objs.at(8)->setWorldTranslate(glm::vec3(-0.2f, -0.2f, 0.0f));
+
+		objs.at(9)->setWorldScale(glm::vec3(0.06f, 0.2f, 0.06f));
+		objs.at(9)->setWorldTranslate(glm::vec3(0.2f, -0.2f, 0.0f));
+
+		objs.at(10)->setWorldScale(glm::vec3(0.05f, 0.2f, 0.1f));
+		objs.at(10)->setWorldTranslate(glm::vec3(-1.0f, 0.0f, 0.0f));
+
+		objs.at(11)->setWorldScale(glm::vec3(0.05f, 0.2f, 0.1f));
+		objs.at(11)->setWorldTranslate(glm::vec3(1.0f, 0.0f, 0.0f));
+
+		objs.at(12)->setWorldScale(glm::vec3(0.08f, 0.08f, 0.08f));
+		objs.at(12)->setWorldTranslate(glm::vec3(0.0f, -3.9f, 0.08f));
+	}
+
+	// Tree
+	{ 
+		objs.at(13)->setWorldTranslate(glm::vec3(0.7f, -0.3f, 0.7f));
+		objs.at(13)->setWorldScale(glm::vec3(0.4f, 1.0f, 0.4f));
+		
+		objs.at(14)->setWorldTranslate(glm::vec3(0.7f, 0.0f, 0.7f));
+		objs.at(14)->setWorldScale(glm::vec3(0.4f, 0.4f, 0.4f));
+	}
+	
+	// Running
+	{ 
+		objs.at(15)->setWorldTranslate(glm::vec3(-0.7f, -0.48f, 0.7f));
+		objs.at(15)->setWorldScale(glm::vec3(0.8f, 0.1f, 0.5f));
+
+		objs.at(16)->setWorldTranslate(glm::vec3(-0.84f, -0.45f, 0.78f));
+		objs.at(16)->setWorldScale(glm::vec3(0.1f, 0.3f, 0.1f));
+
+		objs.at(17)->setWorldTranslate(glm::vec3(-0.84f, -0.45f, 0.62f));
+		objs.at(17)->setWorldScale(glm::vec3(0.1f, 0.3f, 0.1f));
+
+		objs.at(18)->setWorldTranslate(glm::vec3(-0.84f, -0.38f, 0.7f));
+		objs.at(18)->setWorldScale(glm::vec3(0.1f, 0.1f, 0.5f));
+
+		objs.at(19)->setWorldTranslate(glm::vec3(-0.7f, -0.48f, 0.7f));
+		objs.at(19)->setWorldScale(glm::vec3(0.4f, 0.1f, 0.2f));
+
+		// Person
+		objs.at(20)->setWorldTranslate(glm::vec3(-0.7f, -0.3f, 0.7f));
+		objs.at(20)->setWorldScale(glm::vec3(0.05f, 0.05f, 0.05f));
+
+		objs.at(21)->setWorldTranslate(glm::vec3(-0.7f, -0.36f, 0.7f));
+		objs.at(21)->setWorldScale(glm::vec3(0.15f, 0.2f, 0.15f));
+
+		objs.at(22)->setWorldTranslate(glm::vec3(0.0f, 0.0f, 0.74f));
+		objs.at(22)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
+
+		objs.at(23)->setWorldTranslate(glm::vec3(0.0f, 0.0f, 0.66f));
+		objs.at(23)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
+
+		objs.at(24)->setWorldTranslate(glm::vec3(0.0f, -0.05f, 0.72f));
+		objs.at(24)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
+
+		objs.at(25)->setWorldTranslate(glm::vec3(0.0f, -0.05f, 0.68f));
+		objs.at(25)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
+	}
+	
+	// Bar
+	{ 
+		objs.at(26)->setWorldTranslate(glm::vec3(0.6f, -0.3f, -0.8f));
+		objs.at(26)->setWorldScale(glm::vec3(0.1f, 1.0f, 0.1f));
+
+		objs.at(27)->setWorldTranslate(glm::vec3(0.6f, -0.3f, -0.5f));
+		objs.at(27)->setWorldScale(glm::vec3(0.1f, 1.0f, 0.1f));
+
+		objs.at(28)->setWorldTranslate(glm::vec3(0.6f, -0.1f, -0.65f));
+		objs.at(28)->setWorldScale(glm::vec3(0.1f, 0.1f, 0.83f));
+
+		// Person
+		objs.at(29)->setWorldTranslate(glm::vec3(0.0f, -0.07f, -0.66f));
+		objs.at(29)->setWorldScale(glm::vec3(0.05f, 0.05f, 0.05f));
+
+		objs.at(30)->setWorldTranslate(glm::vec3(0.0f, -0.13f, -0.66f));
+		objs.at(30)->setWorldScale(glm::vec3(0.15f, 0.2f, 0.15f));
+
+		objs.at(31)->setWorldTranslate(glm::vec3(0.0f, -0.06f, -0.70f));
+		objs.at(31)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
+
+		objs.at(32)->setWorldTranslate(glm::vec3(0.0f, -0.06f, -0.62f));
+		objs.at(32)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
+
+		objs.at(33)->setWorldTranslate(glm::vec3(0.0f, -0.2f, -0.68f));
+		objs.at(33)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
+
+		objs.at(34)->setWorldTranslate(glm::vec3(0.0f, -0.2f, -0.64f));
+		objs.at(34)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
 	}
 }
 
@@ -166,25 +258,22 @@ void Example::draw()
 	globalMat = glm::mat4(1.0f);
 	shader->setOutWorldTransform(globalMat);
 
-	{ // Stages
+	// Stages
+	{ 
 		objs.at(0)->setWorldTranslate(glm::vec3(0.0f, door, 0.0f));
-		for (unsigned int i = 0; i < 6; i++)
+		for (unsigned int i = 1; i < 6; i++)
 			objs.at(i)->draw(shader);		
 	}
 
-	{ // Robot
+	// Robot
+	{ 
 		globalMat = glm::mat4(1.0f);
 		globalMat = glm::translate(glm::vec3(move_x, move_y, move_z));
 		globalMat = glm::rotate(globalMat, glm::radians(way), glm::vec3(0.0f, 1.0f, 0.0f));		
 		shader->setOutWorldTransform(globalMat);
 		objs.at(6)->draw(shader);
-
-		globalMat = glm::mat4(1.0f);
-		globalMat = glm::translate(glm::vec3(move_x, move_y, move_z));
-		globalMat = glm::rotate(globalMat, glm::radians(way), glm::vec3(0.0f, 1.0f, 0.0f));
-		shader->setOutWorldTransform(globalMat);
 		objs.at(7)->draw(shader);
-		objs.at(objs.size() - 1)->draw(shader);
+		objs.at(12)->draw(shader);
 
 		globalMat = glm::mat4(1.0f);
 		globalMat = glm::translate(glm::vec3(move_x, -0.43f + move_y, move_z));
@@ -215,16 +304,64 @@ void Example::draw()
 		objs.at(11)->draw(shader);
 	}
 
-	{ // Tree
-		//globalMat = glm::globalMat()
-	}	
-}
+	// Tree
+	{ 
+		globalMat = glm::mat4(1.0f);
+		shader->setOutWorldTransform(globalMat);
+		objs.at(13)->draw(shader);
+		objs.at(14)->setWorldScale(glm::vec3(1.0f + animation / 10.0f, 1.0f + animation / 10.0f, 1.0f + animation / 10.0f));
+		objs.at(14)->draw(shader);	
+	}
 
-void Example::globalTransform(glm::vec3 trans, float angle, glm::vec3 axis)
-{
-	/*globalMat = glm::mat4(1.0f);
-	globalMat = glm::translate(trans);
-	globalMat = glm::rotate(globalMat, glm::radians(angle), );*/
+	// Running
+	{ 
+		if (animation != 0.0f)
+			objs.at(19)->setWorldRotate(-0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
+		for (unsigned int i = 15; i <= 21; i++)
+		{
+			objs.at(i)->draw(shader);
+		}		
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.7f, -0.36f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(robot), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		objs.at(22)->draw(shader);
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.7f, -0.36f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(-robot), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		objs.at(23)->draw(shader);
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.7f, -0.4f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(-robot), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		objs.at(24)->draw(shader);
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.7f, -0.4f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(robot), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		objs.at(25)->draw(shader);
+	}
+
+	// Bar
+	{
+		globalMat = glm::mat4(1.0f);
+		shader->setOutWorldTransform(globalMat);
+		objs.at(26)->draw(shader);
+		objs.at(27)->draw(shader);
+		objs.at(28)->draw(shader);
+		
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(0.6f, -0.1f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(turning), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		for (unsigned int i = 29; i <= 34; i++)
+			objs.at(i)->draw(shader);
+	}
 }
 
 void Example::key_event(unsigned char key, int x, int y)
@@ -254,18 +391,26 @@ void Example::key_event(unsigned char key, int x, int y)
 		break;
 	case 'w': case 'W':
 		way = 180.0f;
+		if(move_z >= -0.8f) move_z -= amount;
 		break;
 	case 'a': case 'A':
 		way = -90.f;
+		if (move_x >= -0.8f) move_x -= amount;
 		break;
 	case 's': case 'S':
 		way = 0.0f;
+		if (move_z <= 0.8f) move_z += amount;
 		break;
 	case 'd': case 'D':
 		way = 90.0f;
+		if (move_x <= 0.8f) move_x += amount;
 		break;
 	case 'j': case 'J':
 		jump = 0.02f;
+		break;
+	case 'p': case 'P':
+		if (increase == 0.0f) increase = 0.01f;
+		else increase = 0.0f;
 		break;
 	case 'm': case 'M':
 		if (polygon_mode == GL_LINE)
@@ -290,27 +435,12 @@ bool Example::setTimer()
 		if (move_y > 0.2f)
 			jump *= -1.0f;
 	}
-		
-	if (way == 90.0f)
-	{
-		move_x += amount;
-		if (move_x > 0.8f) way = -90.0f;
-	}
-	if (way == -90.0f)
-	{
-		move_x -= amount;
-		if (move_x < -0.8f) way = 90.0f;
-	}
-	if (way == 180.0f)
-	{
-		move_z -= amount;
-		if (move_z < -0.8f)	way = 0.0f;
-	}
-	if (way == 0.0f)
-	{
-		move_z += amount;
-		if (move_z > 0.8f) way = 180.0f;
-	}
+
+	animation += increase;
+	if (animation > 0.1f || animation < -0.1f) increase *= -1.0f;
+
+	turning += 0.5f;
+
 	return true;
 }
 

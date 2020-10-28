@@ -102,14 +102,16 @@ void Sphere::addVertex(float x, float y, float z)
 
 void Sphere::addColor()
 {
-	if(color == "red")
+	if (color == "red")
 		colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-	else if(color == "blue")
+	else if (color == "blue")
 		colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
-	else if(color == "green")
+	else if (color == "green")
 		colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-	else if(color == "gray")
+	else if (color == "gray")
 		colors.push_back(glm::vec3(0.3f, 0.3f, 0.3f));
+	else if (color == "yellow")
+		colors.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
 	else
 		colors.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 }
@@ -130,5 +132,5 @@ void Sphere::draw(Shader* shader)
 {
 	shader->setWorldTransform(getWorldTransformMat());
 	vertexArray->setActive();
-	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_LINE_LOOP, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

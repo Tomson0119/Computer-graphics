@@ -36,6 +36,12 @@ private:
 	float increase;
 	float turning;
 
+	float bench;
+	float bench_rotate;
+	float bench_bar;
+	float bench_bar_amount;
+
+	bool trigger;
 
 	unsigned int polygon_mode;
 	unsigned int window_w;
@@ -53,14 +59,14 @@ public:
 	bool setTimer();
 
 private:
-	
+	void print_location();
 
 private:
 	struct Camera
 	{
 		glm::vec3 Direction = glm::vec3(0.0f, 0.0f, -1.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 Position = glm::vec3(0.0f, 0.2f, 3.0f);
+		glm::vec3 Position = glm::vec3(0.0f, 0.2f, 2.5f);
 	};
 
 	Camera camera = Camera();

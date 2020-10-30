@@ -16,7 +16,9 @@ Example::Example()
 	polygon_mode(GL_LINE), robot(0.0f), robot_rotate(1.0f),
 	move_x(0.0f), move_z(0.8f), way(0.0f), amount(0.01f),
 	move_y(0.0f), jump(0.0f), door(0.0f), door_move(0.0f),
-	animation(0.0f), increase(0.0f), turning(0.0f)
+	animation(0.0f), increase(0.01f), turning(0.0f), 
+	bench(0.0f), bench_rotate(0.5f), trigger(false),
+	bench_bar(0.0f), bench_bar_amount(0.00022f)
 {
 	shader = new Shader();
 
@@ -80,7 +82,35 @@ Example::Example()
 		objs.push_back(new Cube("red"));
 		objs.push_back(new Cube("red"));
 	}
-	
+
+	// Bench 35 ~ 50
+	{
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Cube("blue"));
+
+		objs.push_back(new Cube("blue"));
+		objs.push_back(new Sphere("red"));
+		objs.push_back(new Sphere("red"));
+		objs.push_back(new Sphere("yellow"));
+		objs.push_back(new Sphere("yellow"));
+
+		// Person
+		objs.push_back(new Sphere("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("red"));
+		objs.push_back(new Cube("yellow"));
+		objs.push_back(new Cube("yellow"));
+		objs.push_back(new Cube("green"));
+		objs.push_back(new Cube("green"));
+	}
+
+	{ // Tower 51 ~ 53
+		objs.push_back(new Cube("yellow"));
+		objs.push_back(new Cube("purple"));
+		objs.push_back(new Cube("red"));
+	}	
 }
 
 Example::~Example()
@@ -238,6 +268,71 @@ void Example::init(int window_w, int window_h)
 		objs.at(34)->setWorldTranslate(glm::vec3(0.0f, -0.2f, -0.64f));
 		objs.at(34)->setWorldScale(glm::vec3(0.1f, 0.2f, 0.05f));
 	}
+
+	// Bench
+	{
+		objs.at(35)->setWorldTranslate(glm::vec3(-0.6f, -0.48f, -0.6f));
+		objs.at(35)->setWorldScale(glm::vec3(0.3f, 0.1f, 0.6f));
+
+		objs.at(36)->setWorldTranslate(glm::vec3(-0.68f, -0.44f, -0.7f));
+		objs.at(36)->setWorldScale(glm::vec3(0.1f, 0.3f, 0.1f));
+
+		objs.at(37)->setWorldTranslate(glm::vec3(-0.52f, -0.44f, -0.7f));
+		objs.at(37)->setWorldScale(glm::vec3(0.1f, 0.3f, 0.1f));
+
+		objs.at(38)->setWorldTranslate(glm::vec3(-0.6f, -0.33f, -0.66f));
+		objs.at(38)->setWorldScale(glm::vec3(0.7f, 0.03f, 0.03f));
+
+		objs.at(39)->setWorldTranslate(glm::vec3(-0.7f, -0.33f, -0.66f));
+		objs.at(39)->setWorldScale(glm::vec3(0.03f, 0.1f, 0.1f));
+
+		objs.at(40)->setWorldTranslate(glm::vec3(-0.5f, -0.33f, -0.66f));
+		objs.at(40)->setWorldScale(glm::vec3(0.03f, 0.1f, 0.1f));
+
+		objs.at(41)->setWorldTranslate(glm::vec3(-0.73f, -0.33f, -0.66f));
+		objs.at(41)->setWorldScale(glm::vec3(0.03f, 0.07f, 0.07f));
+
+		objs.at(42)->setWorldTranslate(glm::vec3(-0.47f, -0.33f, -0.66f));
+		objs.at(42)->setWorldScale(glm::vec3(0.03f, 0.07f, 0.07f));
+
+
+		// Person
+		objs.at(43)->setWorldTranslate(glm::vec3(-0.6f, -0.44f, -0.7f));
+		objs.at(43)->setWorldScale(glm::vec3(0.05f, 0.05f, 0.05f));
+
+		objs.at(44)->setWorldTranslate(glm::vec3(-0.6f, -0.45f, -0.65f));
+		objs.at(44)->setWorldScale(glm::vec3(0.15f, 0.2f, 0.15f));
+
+		objs.at(45)->setWorldTranslate(glm::vec3(-0.62f, -0.45f, -0.58f));
+		objs.at(45)->setWorldScale(glm::vec3(0.05f, 0.1f, 0.2f));
+
+		objs.at(46)->setWorldTranslate(glm::vec3(-0.58f, -0.45f, -0.58f));
+		objs.at(46)->setWorldScale(glm::vec3(0.05f, 0.1f, 0.2f));
+
+		objs.at(47)->setWorldTranslate(glm::vec3(0.0f, 0.02f, -0.66f));
+		objs.at(47)->setWorldScale(glm::vec3(0.05f, 0.1f, 0.05f));
+
+		objs.at(48)->setWorldTranslate(glm::vec3(0.0f, 0.02, -0.66f));
+		objs.at(48)->setWorldScale(glm::vec3(0.05f, 0.1f, 0.05f));
+
+		objs.at(49)->setWorldTranslate(glm::vec3(0.0f, 0.06f, -0.66f));
+		objs.at(49)->setWorldScale(glm::vec3(0.05f, 0.1f, 0.05f));
+
+		objs.at(50)->setWorldTranslate(glm::vec3(0.0f, 0.06f, -0.66f));
+		objs.at(50)->setWorldScale(glm::vec3(0.05f, 0.1f, 0.05f));
+	}
+
+	// Tower
+	{
+		objs.at(51)->setWorldTranslate(glm::vec3(0.0f, -0.43f, 0.0f));
+		objs.at(51)->setWorldScale(glm::vec3(0.4f, 0.4f, 0.4f));
+
+		objs.at(52)->setWorldTranslate(glm::vec3(0.0f, -0.24f, 0.0f));
+		objs.at(52)->setWorldScale(glm::vec3(0.5f, 0.5f, 0.5f));
+
+		objs.at(53)->setWorldTranslate(glm::vec3(0.0f, -0.07f, 0.0f));
+		objs.at(53)->setWorldScale(glm::vec3(0.3f, 0.3f, 0.3f));
+	}
 }
 
 void Example::draw()
@@ -315,7 +410,7 @@ void Example::draw()
 
 	// Running
 	{ 
-		if (animation != 0.0f)
+		if (trigger)
 			objs.at(19)->setWorldRotate(-0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
 		for (unsigned int i = 15; i <= 21; i++)
 		{
@@ -362,6 +457,58 @@ void Example::draw()
 		for (unsigned int i = 29; i <= 34; i++)
 			objs.at(i)->draw(shader);
 	}
+
+	// Bench
+	{
+		globalMat = glm::mat4(1.0f);
+		shader->setOutWorldTransform(globalMat);
+		for (unsigned int i = 35; i <= 37; i++)
+			objs.at(i)->draw(shader);
+		for (unsigned int i = 43; i <= 46; i++)
+			objs.at(i)->draw(shader);
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(0.0f,bench_bar, 0.0f));
+		shader->setOutWorldTransform(globalMat);
+		for (unsigned int i = 38; i <= 42; i++)
+			objs.at(i)->draw(shader);
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.64f, -0.42f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(bench), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		objs.at(47)->draw(shader);
+		
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.64f, -0.42f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(bench), glm::vec3(0.0f, 0.0f, 1.0f));
+		if(trigger)
+			objs.at(49)->setWorldRotate(-bench_rotate * 2.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);		
+		objs.at(49)->draw(shader);
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.56f, -0.42f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(-bench), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		objs.at(48)->draw(shader);
+
+		globalMat = glm::mat4(1.0f);
+		globalMat = glm::translate(glm::vec3(-0.56f, -0.42f, 0.0f));
+		globalMat = glm::rotate(globalMat, glm::radians(-bench), glm::vec3(0.0f, 0.0f, 1.0f));
+		shader->setOutWorldTransform(globalMat);
+		if(trigger)
+			objs.at(50)->setWorldRotate(bench_rotate * 2.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		objs.at(50)->draw(shader);
+	}
+
+	// Tower
+	{
+		globalMat = glm::mat4(1.0f);
+		shader->setOutWorldTransform(globalMat);
+		for (unsigned int i = 51; i <= 53; i++)
+			objs.at(i)->draw(shader);
+	}
 }
 
 void Example::key_event(unsigned char key, int x, int y)
@@ -385,32 +532,64 @@ void Example::key_event(unsigned char key, int x, int y)
 		camera_turn = 1;
 		camera.Direction = glm::rotate(camera.Direction, glm::radians(3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		break;
-	case 'r': case 'R':
+	case 'r':
 		camera_turn = 0;
 		angle += 1.5f;
 		break;
+	case 'R':
+		camera_turn = 0;
+		angle -= 1.5f;
+		break;
 	case 'w': case 'W':
+		print_location();
 		way = 180.0f;
-		if(move_z >= -0.8f) move_z -= amount;
+
+		if (move_z < -0.8f || (move_x >= -0.15f && move_x <= 0.15f && move_z <= 0.15f && move_z >= 0.14f)
+			|| (move_x <= -0.48f && move_x >= -0.71f && move_z <= -0.45f && move_z >= -0.46f)
+			|| (move_x <= 0.62f && move_x >= 0.55f && move_z >= -0.5f && move_z <= -0.45f))
+			break;
+		else
+			move_z -= amount;
+
+
 		break;
 	case 'a': case 'A':
+		print_location();
 		way = -90.f;
-		if (move_x >= -0.8f) move_x -= amount;
+		if (move_x < -0.8f || (move_z > 0.55f && move_x < -0.48f)
+			|| (move_x <= 0.15f && move_x >= 0.14f && move_z >= -0.15f && move_z <= 0.15f)
+			|| (move_x <= -0.47f && move_x >= -0.48f && move_z >= -0.78f && move_z <= -0.49f)
+			|| (move_x <= 0.71f && move_x >= 0.7f && move_z < -0.45f))
+			break;
+		else
+			move_x -= amount;
 		break;
 	case 's': case 'S':
+		print_location();
 		way = 0.0f;
-		if (move_z <= 0.8f) move_z += amount;
+		if (move_z > 0.8f || (move_z >= 0.54f && move_z <= 0.55f && (move_x > 0.55f || move_x < -0.55f))
+			|| (move_x >= -0.15f && move_x <= 0.15f && move_z <= -0.15f && move_z >= -0.14f)
+			|| (move_x <= -0.48f && move_x >= -0.71f && move_z <= -0.78f && move_z >= -0.79f))
+			break;
+		else
+			move_z += amount;
 		break;
 	case 'd': case 'D':
+		print_location();
 		way = 90.0f;
-		if (move_x <= 0.8f) move_x += amount;
+		if (move_x > 0.8f || (move_z > 0.55f && move_x > 0.55f)
+			|| (move_x <= -0.14f && move_x >= -0.15f && move_z >= -0.15f && move_z <= 0.15f)
+			|| (move_x <= -0.70f && move_x >= -0.71f && move_z >= -0.78f && move_z <= -0.49f)
+			|| (move_x <= 0.5f && move_x >= 0.49f && move_z < -0.45f))
+			break;
+		else
+			move_x += amount;
 		break;
 	case 'j': case 'J':
 		jump = 0.02f;
 		break;
 	case 'p': case 'P':
-		if (increase == 0.0f) increase = 0.01f;
-		else increase = 0.0f;
+		trigger = true;
 		break;
 	case 'm': case 'M':
 		if (polygon_mode == GL_LINE)
@@ -422,25 +601,39 @@ void Example::key_event(unsigned char key, int x, int y)
 	}
 }
 
+void Example::print_location()
+{
+	std::cout << "(X, Z) : " << move_x << " " << move_z << std::endl;
+}
+
 bool Example::setTimer()
 {	
 	if (door < 1.0f) door += door_move;
-	robot += robot_rotate;
-	if (robot >= 45.0f || robot <= -45.0f) robot_rotate *= -1.0f;
 
-	if (move_y + jump < 0.0f)
-		move_y = 0.0f, jump = 0.0f;
-	else {
-		move_y += jump;
-		if (move_y > 0.2f)
-			jump *= -1.0f;
-	}
+	if (trigger)
+	{
+		robot += robot_rotate;
+		if (robot >= 45.0f || robot <= -45.0f) robot_rotate *= -1.0f;
 
-	animation += increase;
-	if (animation > 0.1f || animation < -0.1f) increase *= -1.0f;
+		if (move_y + jump < 0.0f)
+			move_y = 0.0f, jump = 0.0f;
+		else {
+			move_y += jump;
+			if (move_y > 0.2f)
+				jump *= -1.0f;
+		}
 
-	turning += 0.5f;
+		animation += increase;
+		if (animation > 0.1f || animation < -0.1f) increase *= -1.0f;
 
+		turning += 0.5f;
+		bench += bench_rotate;
+		if (bench >= 45.0f || bench < 0.0f) bench_rotate *= -1.0f;
+
+		bench_bar -= bench_bar_amount;
+		if (bench_bar < -0.02f || bench_bar >= 0.0f) bench_bar_amount *= -1.0f;
+	}	
+	
 	return true;
 }
 

@@ -32,6 +32,8 @@ Cube::Cube(const char* color)
 			colors.emplace_back(glm::vec3(0.0f, 1.0f, 1.0f));
 		else if (color == "brown")
 			colors.emplace_back(glm::vec3(0.8f, 0.2f, 0.2f));
+		else if (color == "gray")
+			colors.emplace_back(glm::vec3(0.7f, 0.7f, 0.7f));
 		else
 			colors.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	}

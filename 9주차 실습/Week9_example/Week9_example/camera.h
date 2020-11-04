@@ -29,4 +29,5 @@ public:
 
 	void translateCameraPos(float x, float y, float z);
 	void rotateCameraCenter(float angle, float x, float y, float z);
+	void rotateCameraPos(float angle, float x, float y, float z);
 };

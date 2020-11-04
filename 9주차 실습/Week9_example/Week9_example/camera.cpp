@@ -32,3 +32,9 @@ void Camera::rotateCameraCenter(float angle, float x, float y, float z)
 	Direction += Position;
 	viewMat = glm::lookAt(Position, Direction, Up);
 }
+
+void Camera::rotateCameraPos(float angle, float x, float y, float z)
+{
+	Position = glm::rotate(Position, glm::radians(angle), glm::vec3(x, y, z));
+	viewMat = glm::lookAt(Position, Direction, Up);
+}

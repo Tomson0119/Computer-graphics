@@ -23,12 +23,6 @@ private:
 	unsigned int polygon_mode;
 
 	int REvent;
-	int BEvent;
-	int NEvent;
-	int TEvent;
-	bool GEvent;
-
-	float move_x;
 
 	int prev_time;
 

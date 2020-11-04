@@ -1,0 +1,81 @@
+#include "util.h"
+#include "example.h"
+
+#include <gl/freeglut.h>
+#include <gl/glew.h>
+
+
+// Basig elements
+Util util = Util(900, 1000);
+Example example = Example(util.getWindowWidth(), util.getWinodwHeight());
+
+//Callback functions
+GLvoid draw();
+GLvoid reshape(int w, int h);
+GLvoid key_event(unsigned char key, int x, int y);
+GLvoid mouse_event(int button, int state, int x, int y);
+GLvoid mouse_motion(int x, int y);
+GLvoid setTimer(int value);
+
+int main(int argc, char** argv)
+{
+	// Initialization
+	util.create_window(argc, argv);
+	util.init_glew();
+
+	// Initialize program
+	example.init();
+
+	// Callbacks
+	glutDisplayFunc(draw);
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(key_event);
+	glutTimerFunc(16, setTimer, 1);
+	glutMouseFunc(mouse_event);
+	glutMotionFunc(mouse_motion);
+
+	glutMainLoop();
+	return 0;
+}
+
+
+GLvoid draw()
+{
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+	glEnable(GL_DEPTH_TEST);
+
+	example.draw();
+
+	glutSwapBuffers();
+}
+
+GLvoid reshape(int w, int h)
+{
+	glViewport(0, 0, util.getWindowWidth(), util.getWinodwHeight());
+}
+
+GLvoid key_event(unsigned char key, int x, int y)
+{
+	example.key_event(key, x, y);
+	glutPostRedisplay();
+}
+
+GLvoid mouse_event(int button, int state, int x, int y)
+{
+	example.mouse_event(button, state, x, y);
+	glutPostRedisplay();
+}
+
+GLvoid mouse_motion(int x, int y)
+{
+	example.motion_event(x, y);
+	glutPostRedisplay();
+}
+
+GLvoid setTimer(int value)
+{
+	example.setTimer();
+	glutPostRedisplay();
+	glutTimerFunc(16, setTimer, 1);	
+}

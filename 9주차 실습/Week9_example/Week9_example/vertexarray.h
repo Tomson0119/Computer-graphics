@@ -15,8 +15,11 @@ private:
 
 public:
 	VertexArray(const std::vector<glm::vec3>& vertices,
-				const std::vector<glm::vec3>& colors,
+				const std::vector<glm::vec3>& normals,
 				const std::vector<unsigned int>& indices);
+
+	VertexArray(const std::vector<glm::vec3>& vertices,
+				const std::vector<glm::vec3>& normals);
 
 	~VertexArray();
 
@@ -24,6 +27,9 @@ public:
 
 private:
 	void set_buffer(const std::vector<glm::vec3>& vertices,
-					const std::vector<glm::vec3>& colors,
+					const std::vector<glm::vec3>& normals,
 					const std::vector<unsigned int>& indices);
+
+	void set_buffer(const std::vector<glm::vec3>& vertices,
+					const std::vector<glm::vec3>& normals);
 };

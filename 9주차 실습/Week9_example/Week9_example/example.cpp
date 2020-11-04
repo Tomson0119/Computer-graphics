@@ -126,7 +126,7 @@ void Example::setTimer()
 		if (delta_time > 10) {
 			red = (float)abs(cos(color));
 			blue = (float)abs(sin(color));
-			green = 1.0f - (red + green);
+			green = 1.0f - (red + blue);
 			prev_time = time;
 			color += 0.01f;
 		}

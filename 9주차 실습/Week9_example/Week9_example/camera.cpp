@@ -1,6 +1,7 @@
 #include "camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 Camera::Camera(int window_w, int window_h)
 {
@@ -16,4 +17,18 @@ Camera::Camera(int window_w, int window_h)
 
 Camera::~Camera()
 {
+}
+
+void Camera::translateCameraPos(float x, float y, float z)
+{
+	Position = Position + glm::vec3(x, y, z);
+	viewMat = glm::lookAt(Position, Direction, Up);
+}
+
+void Camera::rotateCameraCenter(float angle, float x, float y, float z)
+{
+	Direction -= Position;
+	Direction = glm::rotate(Direction, glm::radians(angle), glm::vec3(x, y, z));
+	Direction += Position;
+	viewMat = glm::lookAt(Position, Direction, Up);
 }

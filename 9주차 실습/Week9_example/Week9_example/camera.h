@@ -26,4 +26,7 @@ public:
 	glm::mat4 getProjMat() { return projMat; }
 	
 	glm::vec3 getPosition() { return Position; }
+
+	void translateCameraPos(float x, float y, float z);
+	void rotateCameraCenter(float angle, float x, float y, float z);
 };

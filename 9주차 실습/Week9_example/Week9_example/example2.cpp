@@ -76,7 +76,7 @@ void Example2::init()
 
 void Example2::draw()
 {
-	// Spheres
+	// Crane
 	lightShader->use_program();
 
 	lightShader->setMat4("view", camera->getViewMat());

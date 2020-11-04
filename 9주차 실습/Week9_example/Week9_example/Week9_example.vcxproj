@@ -127,7 +127,9 @@
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="example.cpp" />
     <ClCompile Include="example2.cpp" />
+    <ClCompile Include="example3.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="pyramid.cpp" />
     <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sphere.cpp" />
@@ -139,7 +141,9 @@
     <ClInclude Include="cube.h" />
     <ClInclude Include="example.h" />
     <ClInclude Include="example2.h" />
+    <ClInclude Include="example3.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="pyramid.h" />
     <ClInclude Include="rectangle.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="sphere.h" />

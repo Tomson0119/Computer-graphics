@@ -1,6 +1,7 @@
 #include "util.h"
 #include "example.h"
 #include "example2.h"
+#include "example3.h"
 
 #include <gl/freeglut.h>
 #include <gl/glew.h>
@@ -8,7 +9,7 @@
 
 // Basig elements
 Util util = Util(1200, 900);
-Example2 example = Example2(util.getWindowWidth(), util.getWinodwHeight());
+Example3 example = Example3(util.getWindowWidth(), util.getWinodwHeight());
 
 
 //Callback functions

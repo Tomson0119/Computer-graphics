@@ -11,10 +11,10 @@ Rect::Rect()
 		vertices.emplace_back(glm::vec3(hSize, -hSize, 0.0f));
 		vertices.emplace_back(glm::vec3(hSize, hSize, 0.0f));
 
-		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
-		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
-		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
-		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
+		normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
+		normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
+		normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
+		normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
 
 		indices.emplace_back(0);
 		indices.emplace_back(1);

@@ -24,7 +24,7 @@ Rect::Rect()
 		indices.emplace_back(3);
 	}
 
-	vertexArray = nullptr;
+	setVertexArray();
 }
 
 Rect::~Rect()

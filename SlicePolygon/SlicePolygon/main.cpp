@@ -1,5 +1,5 @@
 #include "util.h"
-#include "example.h"
+#include "program.h"
 
 #include <gl/freeglut.h>
 #include <gl/glew.h>
@@ -7,7 +7,7 @@
 
 // Basig elements
 Util util = Util(900, 1000);
-Example example = Example(util.getWindowWidth(), util.getWinodwHeight());
+Program game = Program(util.getWindowWidth(), util.getWinodwHeight());
 
 //Callback functions
 GLvoid draw();
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	util.init_glew();
 
 	// Initialize program
-	example.init();
+	game.init();
 
 	// Callbacks
 	glutDisplayFunc(draw);
@@ -45,7 +45,7 @@ GLvoid draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	glEnable(GL_DEPTH_TEST);
 
-	example.draw();
+	game.draw();
 
 	glutSwapBuffers();
 }
@@ -57,25 +57,25 @@ GLvoid reshape(int w, int h)
 
 GLvoid key_event(unsigned char key, int x, int y)
 {
-	example.key_event(key, x, y);
+	game.key_event(key, x, y);
 	glutPostRedisplay();
 }
 
 GLvoid mouse_event(int button, int state, int x, int y)
 {
-	example.mouse_event(button, state, x, y);
+	game.mouse_event(button, state, x, y);
 	glutPostRedisplay();
 }
 
 GLvoid mouse_motion(int x, int y)
 {
-	example.motion_event(x, y);
+	game.motion_event(x, y);
 	glutPostRedisplay();
 }
 
 GLvoid setTimer(int value)
 {
-	example.setTimer();
+	game.setTimer();
 	glutPostRedisplay();
 	glutTimerFunc(16, setTimer, 1);	
 }

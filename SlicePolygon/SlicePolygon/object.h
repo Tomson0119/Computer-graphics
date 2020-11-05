@@ -3,7 +3,10 @@
 #include "shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+
 #include <iostream>
+#include <cmath>
+
 class Object
 {
 public:
@@ -29,38 +32,41 @@ public:
 	}
 	void setWorldTranslate(const glm::vec3& vec)
 	{
-		pos = pos + vec * scale;
+		pos += vec;
 		worldTransform = glm::translate(worldTransform, vec);
 	}
 	void setWorldTranslate(float x, float y, float z)
 	{
 		glm::vec3 vec(x, y, z);
-		pos = pos + vec * scale;
+		pos += vec;
 		worldTransform = glm::translate(worldTransform, vec);
-		//std::cout << pos.x << " " << pos.y << " " << pos.z << std::endl;
 	}
 	void setWorldScale(const glm::vec3& vec)
 	{
-		scale = vec * scale;
 		worldTransform = glm::scale(worldTransform, vec);
 	}
 	void setWorldScale(float x, float y, float z)
 	{
 		glm::vec3 vec(x, y, z);
-		scale = vec * scale;
 		worldTransform = glm::scale(worldTransform, vec);
 	}
 
-	void rotateOrigin(float angle, float x, float y, float z)
+	void translateAlong(const glm::vec2& target, float speed)
 	{
-		worldTransform = glm::translate(worldTransform, -pos);
-		setWorldRotate(angle, glm::vec3(x,y,z));
-		worldTransform = glm::translate(worldTransform, pos);
-	}
+		float dx = target.x - pos.x;
+		float dy = target.y - pos.y;
 
+		float distance = sqrt(pow(dx, 2) + pow(dy, 2));
+
+		if (distance == 0) return;
+
+		float x = dx / distance * speed;
+		float y = dy / distance * speed;
+
+		setWorldTranslate(x, y, 0.0f);
+	}
 
 private:
 	glm::mat4 worldTransform = glm::mat4(1.0f);
 	glm::vec3 pos = glm::vec3(0.0f);
-	glm::vec3 scale = glm::vec3(1.0f);
 };

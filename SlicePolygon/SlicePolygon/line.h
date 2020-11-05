@@ -18,6 +18,9 @@ public:
 
 	~Line() override;
 
+	glm::vec2 getVertexBegin() { return vertices.at(0); }
+	glm::vec2 getVertexEnd() { return vertices.at(1); }
+
 	void changePos(const glm::vec2& pos);
 
 	void setVertexArray() override;

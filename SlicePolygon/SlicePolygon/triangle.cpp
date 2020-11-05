@@ -3,12 +3,19 @@
 
 Triangle::Triangle()
 {
-	const float hSize = 0.2f;
+	glm::vec2 vertex[4][3] = {
+		{ glm::vec2( 0.0f,  0.15f), glm::vec2(-0.15f, -0.15f), glm::vec2(0.15f, -0.15f) },
+		{ glm::vec2(-0.2f,  0.05f), glm::vec2( 0.10f, -0.15f), glm::vec2(0.10f,  0.13f) },
+		{ glm::vec2(-0.1f,  0.10f), glm::vec2(-0.13f, -0.20f), glm::vec2(0.14f,  0.00f) },
+		{ glm::vec2( 0.21f, 0.13f), glm::vec2(-0.13f, -0.10f), glm::vec2(0.13f, -0.10f) } 
+	};
 
 	{
-		vertices.emplace_back(glm::vec3(0.0f, hSize, 0.0f));
-		vertices.emplace_back(glm::vec3(-hSize, -hSize, 0.0f));
-		vertices.emplace_back(glm::vec3(hSize, -hSize, 0.0f));		
+		int index = rand() % 4;
+
+		vertices.emplace_back(glm::vec3(vertex[index][0], 0.0f));
+		vertices.emplace_back(glm::vec3(vertex[index][1], 0.0f));
+		vertices.emplace_back(glm::vec3(vertex[index][2], 0.0f));
 
 		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
 		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));

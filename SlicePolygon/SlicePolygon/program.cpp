@@ -1,5 +1,6 @@
 #include "program.h"
 #include "triangle.h"
+#include "rectangle.h"
 #include "line.h"
 
 #include <gl/freeglut.h>
@@ -123,7 +124,7 @@ void Program::setTimer()
 		if (delta_time > 2000)
 		{
 			// Insert New Object
-			objs.push_back(new Triangle());
+			objs.push_back(new Rect());
 			
 			// Insert Randomized Line
 			float begin_y = random->generateFloat(0.2f, 0.8f);

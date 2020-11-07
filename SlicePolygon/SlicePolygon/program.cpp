@@ -1,6 +1,4 @@
 #include "program.h"
-#include "polygon.h"
-#include "line.h"
 
 #include <gl/freeglut.h>
 #include <gl/glew.h>
@@ -14,8 +12,6 @@ using namespace glm;
 
 Program::Program(int window_w, int window_h)
 {
-	srand((unsigned int)time(0));
-
 	shader = new Shader();
 	camera = new Camera(window_w, window_h);
 	util = new Util();
@@ -24,7 +20,8 @@ Program::Program(int window_w, int window_h)
 	animation = true;
 	prev_time = 0;	
 	
-	objs = std::vector<Object*>();
+	objs = std::vector<Poly*>();
+	boxes = std::vector<Poly*>();
 	lines = std::vector<Line*>();
 
 	playerLine = nullptr;
@@ -32,9 +29,13 @@ Program::Program(int window_w, int window_h)
 
 Program::~Program()
 {
-	for (Object* obj : objs)
+	for (Poly* obj : objs)
 		delete obj;
-	std::vector<Object*>().swap(objs);
+	std::vector<Poly*>().swap(objs);
+
+	for (Poly* obj : boxes)
+		delete obj;
+	std::vector<Poly*>().swap(boxes);
 
 	for (Line* line : lines)
 		delete line;
@@ -49,12 +50,20 @@ Program::~Program()
 void Program::init()
 {
 	shader->make_shader("object.vs", "object.fs");
+
+	// for collision check debug
+	objs.push_back(new Poly());
+	vec4 bb = objs.at(objs.size() - 1)->getBoundBox();
+	boxes.push_back(new Poly(bb));
+
+	objs.at(objs.size() - 1)->translateWorld(0.0f, 0.3f);
+	boxes.at(objs.size() - 1)->translateWorld(0.0f, 0.3f);
 }
 
 void Program::draw()
 {
 	shader->use_program();
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	// Player Line
 	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
 	if (playerLine != nullptr) playerLine->draw(shader);
@@ -67,7 +76,13 @@ void Program::draw()
 	// Objects
 	shader->setVec3("objectColor", vec3(1.0f, 0.0f, 0.0f));
 	for (unsigned int i = 0; i < objs.size(); i++)
-		objs.at(i)->draw(shader);	
+		objs.at(i)->draw(shader);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// Bounding Box
+	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
+	for (unsigned int i = 0; i < boxes.size(); i++)
+		boxes.at(i)->draw(shader);
 }
 
 void Program::key_event(unsigned char key, int x, int y)
@@ -91,7 +106,35 @@ void Program::mouse_event(int button, int state, int x, int y)
 		playerLine = new Line(util->convert_xy(x, y));
 
 	else if (state == GLUT_UP)
+	{
+		glm::vec2 begin = playerLine->getVertexBegin();
+		glm::vec2 end = playerLine->getVertexEnd();
+
+		// Collision check
+		if (begin.y >= 0.2f || end.y >= 0.2f) 
+			// Line should be up at least 0.2f
+		{
+			for (unsigned int i = 0; i < objs.size(); i++)
+			{
+				// check if line crosses polygon
+				if (util->checkCollision(playerLine, objs.at(i)))
+				{
+					for (size_t j = 0; j < objs.at(i)->getVerticesSize() - 1; j++)
+					{
+						glm::vec2 Point = util->getIntersectPoint2(begin, end,
+							objs.at(i)->getVertex2(j), objs.at(i)->getVertex2(j + 1));
+						if(Point != vec2(-100.0f))
+							std::cout << "Intersect Point : " << Point.x << " " << Point.y << std::endl;
+					}
+				}
+
+				// if it is true : get crossing 2 points
+
+				// delete polygon and push Two more polygon
+			}
+		}
 		playerLine = nullptr;
+	}
 }
 
 void Program::motion_event(int x, int y)
@@ -107,40 +150,41 @@ void Program::setTimer()
 		int delta_time = time - prev_time;
 		
 		if (delta_time > 10) {
-			for (unsigned int i = 0; i < objs.size(); i++) {
+			//for (unsigned int i = 0; i < objs.size(); i++) {
 
-				// Translate through line
-				glm::vec2 end = lines.at(i)->getVertexEnd();
-				objs.at(i)->translateAlong(end, 0.01f);
+			//	// Translate through line
+			//	glm::vec2 end = lines.at(i)->getVertexEnd();
+				/*objs.at(0)->translateAlong(vec2(-1.3f,0.2f), 0.01f);
+				boxes.at(0)->translateAlong(vec2(-1.3f, 0.2f), 0.01f);*/
 
-				if (objs.at(i)->getPos().x < -1.3f) // Erase Object out of sight
-				{
-					objs.erase(objs.begin()); // Erase Object
-					lines.erase(lines.begin()); // Erase Line					
-					//std::cout << "Deleted" << std::endl;
-				}
-			}			
+			//	if (objs.at(i)->getPos().x < -1.3f) // Erase Object out of sight
+			//	{
+			//		objs.erase(objs.begin()); // Erase Object
+			//		boxes.erase(boxes.begin());
+			//		lines.erase(lines.begin()); // Erase Line					
+			//	}
+			//}			
 		}
 		if (delta_time > 2000)
 		{
-			// Insert New Object
-			objs.push_back(new Poly());
-			
-			// Insert Randomized Line
-			float begin_y = util->generateFloat(0.2f, 0.8f);
-			float end_y = util->generateFloat(0.2f, 0.8f);
+			//// Insert New Object
+			//objs.push_back(new Poly());
+			//glm::vec4 bb = dynamic_cast<Poly*>(objs.at(objs.size() - 1))->getBoundBox();
+			//boxes.push_back(new Poly(bb));
+			//
+			//// Insert Randomized Line
+			//float begin_y = util->generateFloat(0.2f, 0.8f);
+			//float end_y = util->generateFloat(0.2f, 0.8f);
 
-			//std::cout << begin_y << " " << end_y << std::endl;
-			glm::vec2 begin = glm::vec2(1.3f, begin_y);
-			glm::vec2 end = glm::vec2(-1.3f, end_y);
+			//glm::vec2 begin = glm::vec2(1.3f, begin_y);
+			//glm::vec2 end = glm::vec2(-1.3f, end_y);
 
-			lines.push_back(new Line(begin, end));
+			//lines.push_back(new Line(begin, end));
 
-			// Translate Object To Up-Right
-			objs.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
+			//// Translate Object To Up-Right
+			//objs.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
+			//boxes.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
 
-			//std::cout << "Pushed : Triangle" << objs.size() << std::endl;
-			
 			prev_time = time;
 		}
 	}

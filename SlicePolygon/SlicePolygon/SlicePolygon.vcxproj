@@ -145,6 +145,7 @@
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="util.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="vertexarray.cpp" />
   </ItemGroup>
@@ -152,11 +153,9 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="program.h" />
     <ClInclude Include="line.h" />
-    <ClInclude Include="object.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="shader.h" />
-    <ClInclude Include="window.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="vertexarray.h" />
   </ItemGroup>

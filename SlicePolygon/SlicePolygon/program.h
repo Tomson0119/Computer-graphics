@@ -4,7 +4,7 @@
 #include "camera.h"
 #include "util.h"
 
-#include "object.h"
+#include "polygon.h"
 #include "line.h"
 
 #include <vector>
@@ -17,8 +17,10 @@ private:
 	Camera* camera;
 	Util* util;
 
-	std::vector<Object*> objs;
+	std::vector<Poly*> objs;
 	std::vector<Line*> lines;
+	std::vector<Poly*> boxes;
+
 	Line* playerLine;
 
 	unsigned int polygon_mode;

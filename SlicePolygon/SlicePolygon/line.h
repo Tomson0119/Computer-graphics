@@ -20,8 +20,8 @@ public:
 
 	~Line();
 
-	glm::vec2 getVertexBegin() { return vertices.at(0); }
-	glm::vec2 getVertexEnd() { return vertices.at(1); }
+	glm::vec2 getPoint1() { return vertices.at(0); }
+	glm::vec2 getPoint2() { return vertices.at(1); }
 
 	void changePos(const glm::vec2& pos);
 

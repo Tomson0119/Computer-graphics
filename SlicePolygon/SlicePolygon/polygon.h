@@ -22,7 +22,7 @@ public:
 
 	~Poly();
 
-	size_t getVerticesSize() { return vertices.size(); }
+	int getVerticesSize() { return static_cast<int>(vertices.size()); }
 	
 	glm::vec2 getVertex2(int index);
 	glm::vec4 getBoundBox();

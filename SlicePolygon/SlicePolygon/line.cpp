@@ -3,6 +3,7 @@
 
 Line::Line(const glm::vec2& vec)
 {
+	worldTransform = glm::mat4(1.0f);
 	vertexArray = nullptr;
 
 	glm::vec3 pos = glm::vec3(vec, 0.0f);
@@ -21,6 +22,7 @@ Line::Line(const glm::vec2& vec)
 
 Line::Line(const glm::vec2& begin, const glm::vec2& end)
 {
+	worldTransform = glm::mat4(1.0f);
 	vertexArray = nullptr;
 
 	vertices.emplace_back(glm::vec3(begin, 0.0f));
@@ -57,7 +59,7 @@ void Line::setVertexArray()
 
 void Line::draw(Shader* shader)
 {
-	shader->setMat4("world", getWorldTransformMat());
+	shader->setMat4("world", worldTransform);
 	vertexArray->setActive();
 	glDrawElements(GL_LINE_LOOP, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

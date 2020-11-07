@@ -1,5 +1,8 @@
 #include "polygon.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <iostream>
 
 Poly::Poly()
 {
@@ -46,6 +49,32 @@ Poly::Poly()
 		}
 	}
 
+	worldTransform = glm::mat4(1.0f);
+	pos = glm::vec2(0.0f);
+	setVertexArray();
+}
+
+Poly::Poly(const glm::vec4 vec)
+{	
+	float left = vec.x, bottom = vec.y, right = vec.z, up = vec.w;
+
+	vertices.emplace_back(glm::vec3(left, up, 0.0f));
+	vertices.emplace_back(glm::vec3(left, bottom, 0.0f));
+	vertices.emplace_back(glm::vec3(right, bottom, 0.0f));
+	vertices.emplace_back(glm::vec3(right, up, 0.0f));
+
+	for (unsigned int i = 0; i < vertices.size(); i++)
+		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
+
+	indices.emplace_back(0);
+	indices.emplace_back(1);
+	indices.emplace_back(2);
+	indices.emplace_back(0);
+	indices.emplace_back(2);
+	indices.emplace_back(3);
+
+	worldTransform = glm::mat4(1.0f);
+	pos = glm::vec2(0.0f);
 	setVertexArray();
 }
 
@@ -58,6 +87,51 @@ Poly::~Poly()
 	delete vertexArray;
 }
 
+glm::vec2 Poly::getVertex2(int index)
+{
+	if (index >= vertices.size())
+		return glm::vec2(-100.0f);
+	return glm::vec2(vertices.at(index).x, vertices.at(index).y);
+}
+
+glm::vec4 Poly::getBoundBox()
+{
+	float left = 100.0f, bottom = 100.0f, up = -100.0f, right = -100.0f;
+
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		glm::vec3 vertex = vertices.at(i);
+		if (vertex.x < left) left = vertex.x;
+		if (vertex.y < bottom) bottom = vertex.y;
+		if (vertex.x > right) right = vertex.x;
+		if (vertex.y > up) up = vertex.y;
+	}
+	//std::cout << left << " " << bottom << " " << right << " " << up << std::endl;
+	return glm::vec4(left, bottom, right, up);
+}
+
+void Poly::translateAlong(const glm::vec2& target, float speed)
+{
+	float dx = target.x - pos.x;
+	float dy = target.y - pos.y;
+
+	float distance = sqrt(pow(dx, 2) + pow(dy, 2));
+
+	if (distance == 0) return;
+
+	float x = dx / distance * speed;
+	float y = dy / distance * speed;
+
+	translateWorld(x, y);
+}
+
+void Poly::translateWorld(float x, float y)
+{
+	for (unsigned int i = 0; i < vertices.size(); i++)
+		vertices.at(i) += glm::vec3(x, y, 0.0f);
+	worldTransform = glm::translate(worldTransform, glm::vec3(x, y, 0.0f));
+}
+
 void Poly::setVertexArray()
 {
 	vertexArray = new VertexArray(vertices, normals, indices);
@@ -65,7 +139,7 @@ void Poly::setVertexArray()
 
 void Poly::draw(Shader* shader)
 {
-	shader->setMat4("world", getWorldTransformMat());
+	shader->setMat4("world", worldTransform);
 	vertexArray->setActive();
 	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

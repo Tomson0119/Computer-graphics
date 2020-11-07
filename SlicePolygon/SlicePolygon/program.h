@@ -19,13 +19,17 @@ private:
 
 	std::vector<Poly*> objs;
 	std::vector<Line*> lines;
-	std::vector<Poly*> boxes;
 
 	Line* playerLine;
 
 	unsigned int polygon_mode;
-	bool animation;
+
 	int prev_time;
+	int curr_time;
+	int delta_time;
+
+	void collision_event(Poly* obj);
+	void slice_polygon(Poly* obj, glm::vec2 points[]);
 
 public:
 	Program(int window_w, int window_h);

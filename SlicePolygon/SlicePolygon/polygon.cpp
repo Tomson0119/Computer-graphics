@@ -8,8 +8,8 @@ Poly::Poly()
 {
 	glm::vec2 tri[4][3] = {
 		{ glm::vec2(0.0f,  0.15f), glm::vec2(-0.15f, -0.15f), glm::vec2(0.15f, -0.15f) },
-		{ glm::vec2(-0.2f,  0.05f), glm::vec2(0.10f, -0.15f), glm::vec2(0.10f,  0.13f) },
-		{ glm::vec2(-0.1f,  0.10f), glm::vec2(-0.13f, -0.20f), glm::vec2(0.14f,  0.00f) },
+		{ glm::vec2(-0.2f,  0.05f), glm::vec2(0.10f, -0.15f), glm::vec2(0.10f,  0.13f) }, 
+		{ glm::vec2(-0.1f,  0.10f), glm::vec2(-0.13f, -0.20f), glm::vec2(0.14f, 0.00f) },
 		{ glm::vec2(0.21f, 0.13f), glm::vec2(-0.13f, -0.10f), glm::vec2(0.13f, -0.10f) }
 	};
 
@@ -23,7 +23,7 @@ Poly::Poly()
 	{
 		int rectangle = rand() % 2;
 		int index = rand() % 4;
-
+		std::cout << index << "th polygon created .." << std::endl;
 		if (rectangle) {
 			vertices.emplace_back(glm::vec3(rect[index][0], 0.0f));
 			vertices.emplace_back(glm::vec3(rect[index][1], 0.0f));
@@ -39,13 +39,11 @@ Poly::Poly()
 		for (unsigned int i = 0; i < vertices.size(); i++)
 			normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
 
-		indices.emplace_back(0);
-		indices.emplace_back(1);
-		indices.emplace_back(2);
-		if (rectangle) {
+		for (int i = 0; i < vertices.size() - 2; i++)
+		{
 			indices.emplace_back(0);
-			indices.emplace_back(2);
-			indices.emplace_back(3);
+			indices.emplace_back(i + 1);
+			indices.emplace_back(i + 2);
 		}
 	}
 
@@ -54,25 +52,20 @@ Poly::Poly()
 	setVertexArray();
 }
 
-Poly::Poly(const glm::vec4 vec)
+Poly::Poly(const std::vector<glm::vec2>& container)
 {	
-	float left = vec.x, bottom = vec.y, right = vec.z, up = vec.w;
-
-	vertices.emplace_back(glm::vec3(left, up, 0.0f));
-	vertices.emplace_back(glm::vec3(left, bottom, 0.0f));
-	vertices.emplace_back(glm::vec3(right, bottom, 0.0f));
-	vertices.emplace_back(glm::vec3(right, up, 0.0f));
+	for (unsigned int i = 0; i < container.size(); i++)
+		vertices.push_back(glm::vec3(container.at(i), 0.0f));
 
 	for (unsigned int i = 0; i < vertices.size(); i++)
 		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
 
-	indices.emplace_back(0);
-	indices.emplace_back(1);
-	indices.emplace_back(2);
-	indices.emplace_back(0);
-	indices.emplace_back(2);
-	indices.emplace_back(3);
-
+	for (int i = 0; i < vertices.size() - 2; i++)
+	{
+		indices.emplace_back(0);
+		indices.emplace_back(i+1);
+		indices.emplace_back(i+2);
+	}
 	worldTransform = glm::mat4(1.0f);
 	pos = glm::vec2(0.0f);
 	setVertexArray();
@@ -83,7 +76,6 @@ Poly::~Poly()
 	std::vector<glm::vec3>().swap(vertices);
 	std::vector<glm::vec3>().swap(normals);
 	std::vector<unsigned int>().swap(indices);
-
 	delete vertexArray;
 }
 
@@ -92,22 +84,6 @@ glm::vec2 Poly::getVertex2(int index)
 	if (index >= vertices.size())
 		return glm::vec2(-100.0f);
 	return glm::vec2(vertices.at(index).x, vertices.at(index).y);
-}
-
-glm::vec4 Poly::getBoundBox()
-{
-	float left = 100.0f, bottom = 100.0f, up = -100.0f, right = -100.0f;
-
-	for (unsigned int i = 0; i < vertices.size(); i++)
-	{
-		glm::vec3 vertex = vertices.at(i);
-		if (vertex.x < left) left = vertex.x;
-		if (vertex.y < bottom) bottom = vertex.y;
-		if (vertex.x > right) right = vertex.x;
-		if (vertex.y > up) up = vertex.y;
-	}
-	//std::cout << left << " " << bottom << " " << right << " " << up << std::endl;
-	return glm::vec4(left, bottom, right, up);
 }
 
 void Poly::translateAlong(const glm::vec2& target, float speed)
@@ -129,6 +105,7 @@ void Poly::translateWorld(float x, float y)
 {
 	for (unsigned int i = 0; i < vertices.size(); i++)
 		vertices.at(i) += glm::vec3(x, y, 0.0f);
+	pos += glm::vec2(x, y);
 	worldTransform = glm::translate(worldTransform, glm::vec3(x, y, 0.0f));
 }
 

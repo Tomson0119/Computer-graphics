@@ -17,11 +17,12 @@ Program::Program(int window_w, int window_h)
 	util = new Util();
 
 	polygon_mode = GL_FILL;
-	animation = true;
+
 	prev_time = 0;	
+	curr_time = 0;
+	delta_time = 0;
 	
 	objs = std::vector<Poly*>();
-	boxes = std::vector<Poly*>();
 	lines = std::vector<Line*>();
 
 	playerLine = nullptr;
@@ -32,10 +33,6 @@ Program::~Program()
 	for (Poly* obj : objs)
 		delete obj;
 	std::vector<Poly*>().swap(objs);
-
-	for (Poly* obj : boxes)
-		delete obj;
-	std::vector<Poly*>().swap(boxes);
 
 	for (Line* line : lines)
 		delete line;
@@ -51,19 +48,15 @@ void Program::init()
 {
 	shader->make_shader("object.vs", "object.fs");
 
-	// for collision check debug
+	// for debug
 	objs.push_back(new Poly());
-	vec4 bb = objs.at(objs.size() - 1)->getBoundBox();
-	boxes.push_back(new Poly(bb));
-
 	objs.at(objs.size() - 1)->translateWorld(0.0f, 0.3f);
-	boxes.at(objs.size() - 1)->translateWorld(0.0f, 0.3f);
 }
 
 void Program::draw()
 {
 	shader->use_program();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	// Player Line
 	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
 	if (playerLine != nullptr) playerLine->draw(shader);
@@ -77,12 +70,6 @@ void Program::draw()
 	shader->setVec3("objectColor", vec3(1.0f, 0.0f, 0.0f));
 	for (unsigned int i = 0; i < objs.size(); i++)
 		objs.at(i)->draw(shader);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	// Bounding Box
-	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
-	for (unsigned int i = 0; i < boxes.size(); i++)
-		boxes.at(i)->draw(shader);
 }
 
 void Program::key_event(unsigned char key, int x, int y)
@@ -110,38 +97,68 @@ void Program::mouse_event(int button, int state, int x, int y)
 		// Collision check
 		for (unsigned int i = 0; i < objs.size(); i++)
 		{
-			int size = objs.at(i)->getVerticesSize();
-			int intersect = 0;
-			glm::vec2 points[2];
-
-			for (int j = 0; j < size; j++)
-			{
-				std::cout << "Vertex : " << objs.at(i)->getVertex2(j).x
-					<<", "<< objs.at(i)->getVertex2(j).y << std::endl;
-
-				Line line = Line(objs.at(i)->getVertex2(j % size),
-					objs.at(i)->getVertex2((j + 1) % size));
-
-				// Check if line crosses polygon
-				if (util->isIntersection(playerLine, &line))
-				{
-					// Get intersect point
-					points[intersect++] = util->getIntersectPoint2(playerLine, &line);
-				}
-
-				if (intersect == 2) {
-					std::cout << "Slice !" << std::endl;
-					break;
-				}
-			}
-			// delete polygon and push Two more polygon
-			if (intersect == 2) {
-				obj->
-			}
+			collision_event(objs.at(i));
 		}
 		
 		playerLine = nullptr;
 	}
+}
+
+void Program::collision_event(Poly* obj)
+{
+	int size = obj->getVerticesSize();
+	int intersect = 0;
+	glm::vec2 points[2];
+
+	for (int j = 0; j < size; j++)
+	{
+		Line line = Line(obj->getVertex2(j % size),
+			obj->getVertex2((j + 1) % size));
+
+		// Check if line crosses polygon
+		if (util->isIntersection(playerLine, &line))
+		{
+			// Get intersect point
+			points[intersect++] = util->getIntersectPoint2(playerLine, &line);
+		}
+
+		// Delete polygon and push Two more polygon
+		if (intersect == 2) {
+			lines.push_back(new Line(points[0], points[1]));
+
+			std::cout << "Point : " << points[0].x << ", " << points[0].y;
+			std::cout << "        " << points[1].x << ", " << points[1].y << std::endl;
+
+			slice_polygon(obj, points);
+			break;
+		}
+	}
+	
+}
+
+void Program::slice_polygon(Poly* obj, glm::vec2 points[])
+{
+	int size = obj->getVerticesSize();
+
+	std::vector<vec2> left;
+	std::vector<vec2> right;
+
+	for (int j = 0; j < size; j++)
+	{
+		if (util->getPointPosition(points[0], points[1], obj->getVertex2(j)) > 0)
+			left.push_back(obj->getVertex2(j));
+		else
+			right.push_back(obj->getVertex2(j));
+	}
+	left.push_back(points[0]);
+	left.push_back(points[1]);
+	right.push_back(points[0]);
+	right.push_back(points[1]);
+
+	for (unsigned int i = 0; i < left.size(); i++)
+		std::cout << "left : "<<left.at(i).x << " " << left.at(i).y << std::endl;
+	for (unsigned int i = 0; i < right.size(); i++)
+		std::cout << "right : " << right.at(i).x << " " << right.at(i).y << std::endl;
 }
 
 void Program::motion_event(int x, int y)
@@ -151,18 +168,16 @@ void Program::motion_event(int x, int y)
 
 void Program::setTimer()
 {
-	if (animation)
-	{
-		int time = glutGet(GLUT_ELAPSED_TIME);
-		int delta_time = time - prev_time;
-		
-		if (delta_time > 10) {
-			//for (unsigned int i = 0; i < objs.size(); i++) {
+	curr_time = glutGet(GLUT_ELAPSED_TIME);
+	delta_time = curr_time - prev_time;
 
-			//	// Translate through line
-			//	glm::vec2 end = lines.at(i)->getPoint2();
-				/*objs.at(0)->translateAlong(vec2(-1.3f,0.2f), 0.01f);
-				boxes.at(0)->translateAlong(vec2(-1.3f, 0.2f), 0.01f);*/
+	if (delta_time > 10) {
+		//for (unsigned int i = 0; i < objs.size(); i++) {
+
+		//	// Translate through line
+		//	glm::vec2 end = lines.at(i)->getPoint2();
+			/*objs.at(0)->translateAlong(vec2(-1.3f,0.2f), 0.01f);
+			boxes.at(0)->translateAlong(vec2(-1.3f, 0.2f), 0.01f);*/
 
 			//	if (objs.at(i)->getPos().x < -1.3f) // Erase Object out of sight
 			//	{
@@ -171,29 +186,28 @@ void Program::setTimer()
 			//		lines.erase(lines.begin()); // Erase Line					
 			//	}
 			//}			
-		}
-		if (delta_time > 2000)
-		{
-			//// Insert New Object
-			//objs.push_back(new Poly());
-			//glm::vec4 bb = dynamic_cast<Poly*>(objs.at(objs.size() - 1))->getBoundBox();
-			//boxes.push_back(new Poly(bb));
-			//
-			//// Insert Randomized Line
-			//float begin_y = util->generateFloat(0.2f, 0.8f);
-			//float end_y = util->generateFloat(0.2f, 0.8f);
+	}
+	if (delta_time > 2000)
+	{
+		//// Insert New Object
+		//objs.push_back(new Poly());
+		//glm::vec4 bb = dynamic_cast<Poly*>(objs.at(objs.size() - 1))->getBoundBox();
+		//boxes.push_back(new Poly(bb));
+		//
+		//// Insert Randomized Line
+		//float begin_y = util->generateFloat(0.2f, 0.8f);
+		//float end_y = util->generateFloat(0.2f, 0.8f);
 
-			//glm::vec2 begin = glm::vec2(1.3f, begin_y);
-			//glm::vec2 end = glm::vec2(-1.3f, end_y);
+		//glm::vec2 begin = glm::vec2(1.3f, begin_y);
+		//glm::vec2 end = glm::vec2(-1.3f, end_y);
 
-			//lines.push_back(new Line(begin, end));
+		//lines.push_back(new Line(begin, end));
 
-			//// Translate Object To Up-Right
-			//objs.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
-			//boxes.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
+		//// Translate Object To Up-Right
+		//objs.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
+		//boxes.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
 
-			prev_time = time;
-		}
+		prev_time = curr_time;
 	}
 }
 

@@ -10,22 +10,21 @@ private:
 	std::vector<glm::vec3> normals;
 	std::vector<unsigned int> indices;
 
-	glm::mat4 worldTransform;
 	glm::vec2 pos;
+	glm::mat4 worldTransform;
 
 	VertexArray* vertexArray;
-
 	
 public:
 	Poly();
-	Poly(const glm::vec4 vec);
+	// For Rectangle
+	Poly(const std::vector<glm::vec2>& container);
 
 	~Poly();
 
 	int getVerticesSize() { return static_cast<int>(vertices.size()); }
 	
 	glm::vec2 getVertex2(int index);
-	glm::vec4 getBoundBox();
 
 	void translateWorld(float x, float y);
 	void translateAlong(const glm::vec2& target, float speed);

@@ -2,7 +2,7 @@
 
 #include "shader.h"
 #include "camera.h"
-#include "random.h"
+#include "util.h"
 
 #include "object.h"
 #include "line.h"
@@ -15,7 +15,7 @@ class Program
 private:
 	Shader* shader;
 	Camera* camera;
-	Random* random;
+	Util* util;
 
 	std::vector<Object*> objs;
 	std::vector<Line*> lines;
@@ -23,12 +23,7 @@ private:
 
 	unsigned int polygon_mode;
 	bool animation;
-
 	int prev_time;
-
-	
-
-	glm::vec2 convert_xy(int x, int y);
 
 public:
 	Program(int window_w, int window_h);

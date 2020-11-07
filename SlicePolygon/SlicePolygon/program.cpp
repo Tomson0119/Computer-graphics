@@ -1,6 +1,5 @@
 #include "program.h"
-#include "triangle.h"
-#include "rectangle.h"
+#include "polygon.h"
 #include "line.h"
 
 #include <gl/freeglut.h>
@@ -19,7 +18,7 @@ Program::Program(int window_w, int window_h)
 
 	shader = new Shader();
 	camera = new Camera(window_w, window_h);
-	random = new Random();
+	util = new Util();
 
 	polygon_mode = GL_FILL;
 	animation = true;
@@ -44,6 +43,7 @@ Program::~Program()
 	delete playerLine;
 	delete shader;
 	delete camera;
+	delete util;
 }
 
 void Program::init()
@@ -88,7 +88,7 @@ void Program::key_event(unsigned char key, int x, int y)
 void Program::mouse_event(int button, int state, int x, int y)
 {
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
-		playerLine = new Line(convert_xy(x, y));
+		playerLine = new Line(util->convert_xy(x, y));
 
 	else if (state == GLUT_UP)
 		playerLine = nullptr;
@@ -96,7 +96,7 @@ void Program::mouse_event(int button, int state, int x, int y)
 
 void Program::motion_event(int x, int y)
 {
-	playerLine->changePos(convert_xy(x, y));
+	playerLine->changePos(util->convert_xy(x, y));
 }
 
 void Program::setTimer()
@@ -124,11 +124,11 @@ void Program::setTimer()
 		if (delta_time > 2000)
 		{
 			// Insert New Object
-			objs.push_back(new Rect());
+			objs.push_back(new Poly());
 			
 			// Insert Randomized Line
-			float begin_y = random->generateFloat(0.2f, 0.8f);
-			float end_y = random->generateFloat(0.2f, 0.8f);
+			float begin_y = util->generateFloat(0.2f, 0.8f);
+			float end_y = util->generateFloat(0.2f, 0.8f);
 
 			//std::cout << begin_y << " " << end_y << std::endl;
 			glm::vec2 begin = glm::vec2(1.3f, begin_y);
@@ -146,16 +146,3 @@ void Program::setTimer()
 	}
 }
 
-glm::vec2 Program::convert_xy(int x, int y)
-{
-	int width = glutGet(GLUT_WINDOW_WIDTH);
-	int height = glutGet(GLUT_WINDOW_HEIGHT);
-
-	float pos_x = static_cast<float>(x - width / 2) /
-		static_cast<float>(width / 2);
-
-	float pos_y = static_cast<float>(height / 2 - y) /
-		static_cast<float>(height / 2);
-
-	return glm::vec2(pos_x, pos_y);
-}

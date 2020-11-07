@@ -1,19 +1,34 @@
 #pragma once
 
+#include <gl/freeglut.h>
+#include <glm/glm.hpp>
+
+#include <ctime>
+
 class Util
 {
-private:
-	int window_width;
-	int window_height;
-
-	const char* title = "Program";
-
 public:
-	Util(int width, int height);
+	Util()
+	{
+		srand((unsigned int)time(0));
+	}
 
-	void create_window(int argc, char** argv);
-	void init_glew();
+	float generateFloat(float low, float high)
+	{
+		return low + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (high - low));
+	}
 
-	int getWindowWidth() { return window_width; }
-	int getWinodwHeight() { return window_height; }
+	glm::vec2 convert_xy(int x, int y)
+	{
+		int width = glutGet(GLUT_WINDOW_WIDTH);
+		int height = glutGet(GLUT_WINDOW_HEIGHT);
+
+		float pos_x = static_cast<float>(x - width / 2) /
+			static_cast<float>(width / 2);
+
+		float pos_y = static_cast<float>(height / 2 - y) /
+			static_cast<float>(height / 2);
+
+		return glm::vec2(pos_x, pos_y);
+	}
 };

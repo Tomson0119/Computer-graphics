@@ -1,4 +1,4 @@
-#include "util.h"
+#include "window.h"
 
 #include <iostream>
 
@@ -7,13 +7,13 @@
 #include <gl/freeglut_ext.h>
 
 
-Util::Util(int width, int height)
+Window::Window(int width, int height)
 {
 	window_width = width;
 	window_height = height;
 }
 
-void Util::create_window(int argc, char** argv)
+void Window::create_window(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -22,7 +22,7 @@ void Util::create_window(int argc, char** argv)
 	glutCreateWindow(title);
 }
 
-void Util::init_glew()
+void Window::init_glew()
 {
 	glewExperimental = GL_TRUE;
 

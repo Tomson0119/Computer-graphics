@@ -140,13 +140,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="polygon.cpp" />
     <ClCompile Include="program.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="shader.cpp" />
-    <ClCompile Include="triangle.cpp" />
-    <ClCompile Include="util.cpp" />
+    <ClCompile Include="window.cpp" />
     <ClCompile Include="vertexarray.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,11 +153,11 @@
     <ClInclude Include="program.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="object.h" />
-    <ClInclude Include="random.h" />
-    <ClInclude Include="rectangle.h" />
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="triangle.h" />
+    <ClInclude Include="polygon.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="window.h" />
+    <ClInclude Include="window.h" />
     <ClInclude Include="vertexarray.h" />
   </ItemGroup>
   <ItemGroup>

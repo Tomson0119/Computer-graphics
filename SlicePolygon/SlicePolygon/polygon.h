@@ -4,7 +4,7 @@
 #include "vertexarray.h"
 
 
-class Triangle : public Object
+class Poly : public Object
 {
 private:
 	std::vector<glm::vec3> vertices;
@@ -14,8 +14,8 @@ private:
 	VertexArray* vertexArray;
 
 public:
-	Triangle();
-	~Triangle() override;
+	Poly();
+	~Poly() override;
 
 	void setVertexArray() override;
 	void draw(Shader* shader) override;

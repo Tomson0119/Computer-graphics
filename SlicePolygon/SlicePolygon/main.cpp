@@ -1,4 +1,4 @@
-#include "util.h"
+#include "window.h"
 #include "program.h"
 
 #include <gl/freeglut.h>
@@ -6,8 +6,8 @@
 
 
 // Basig elements
-Util util = Util(900, 1000);
-Program game = Program(util.getWindowWidth(), util.getWinodwHeight());
+Window window = Window(900, 1000);
+Program game = Program(window.getWindowWidth(), window.getWinodwHeight());
 
 //Callback functions
 GLvoid draw();
@@ -20,8 +20,8 @@ GLvoid setTimer(int value);
 int main(int argc, char** argv)
 {
 	// Initialization
-	util.create_window(argc, argv);
-	util.init_glew();
+	window.create_window(argc, argv);
+	window.init_glew();
 
 	// Initialize program
 	game.init();
@@ -52,7 +52,7 @@ GLvoid draw()
 
 GLvoid reshape(int w, int h)
 {
-	glViewport(0, 0, util.getWindowWidth(), util.getWinodwHeight());
+	glViewport(0, 0, window.getWindowWidth(), window.getWinodwHeight());
 }
 
 GLvoid key_event(unsigned char key, int x, int y)

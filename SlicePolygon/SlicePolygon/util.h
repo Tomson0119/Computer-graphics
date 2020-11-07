@@ -9,11 +9,13 @@
 
 class Util
 {
+private:
+	float ccw(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3);
 public:
 	Util();
 
-	glm::vec2 getIntersectPoint2(const glm::vec2& v1, const glm::vec2& v2,
-								 const glm::vec2& v3, const glm::vec2& v4);
+	bool isIntersection(Line* line1, Line* line2);
+	glm::vec2 getIntersectPoint2(Line *line1, Line* line2);
 	float generateFloat(float low, float high);
 	glm::vec2 convert_xy(int x, int y);
 };

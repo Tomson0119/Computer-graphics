@@ -107,32 +107,39 @@ void Program::mouse_event(int button, int state, int x, int y)
 
 	else if (state == GLUT_UP)
 	{
-		glm::vec2 begin = playerLine->getVertexBegin();
-		glm::vec2 end = playerLine->getVertexEnd();
-
 		// Collision check
-		if (begin.y >= 0.2f || end.y >= 0.2f) 
-			// Line should be up at least 0.2f
+		for (unsigned int i = 0; i < objs.size(); i++)
 		{
-			for (unsigned int i = 0; i < objs.size(); i++)
+			int size = objs.at(i)->getVerticesSize();
+			int intersect = 0;
+			glm::vec2 points[2];
+
+			for (int j = 0; j < size; j++)
 			{
-				// check if line crosses polygon
-				if (util->checkCollision(playerLine, objs.at(i)))
+				std::cout << "Vertex : " << objs.at(i)->getVertex2(j).x
+					<<", "<< objs.at(i)->getVertex2(j).y << std::endl;
+
+				Line line = Line(objs.at(i)->getVertex2(j % size),
+					objs.at(i)->getVertex2((j + 1) % size));
+
+				// Check if line crosses polygon
+				if (util->isIntersection(playerLine, &line))
 				{
-					for (size_t j = 0; j < objs.at(i)->getVerticesSize() - 1; j++)
-					{
-						glm::vec2 Point = util->getIntersectPoint2(begin, end,
-							objs.at(i)->getVertex2(j), objs.at(i)->getVertex2(j + 1));
-						if(Point != vec2(-100.0f))
-							std::cout << "Intersect Point : " << Point.x << " " << Point.y << std::endl;
-					}
+					// Get intersect point
+					points[intersect++] = util->getIntersectPoint2(playerLine, &line);
 				}
 
-				// if it is true : get crossing 2 points
-
-				// delete polygon and push Two more polygon
+				if (intersect == 2) {
+					std::cout << "Slice !" << std::endl;
+					break;
+				}
+			}
+			// delete polygon and push Two more polygon
+			if (intersect == 2) {
+				obj->
 			}
 		}
+		
 		playerLine = nullptr;
 	}
 }
@@ -153,7 +160,7 @@ void Program::setTimer()
 			//for (unsigned int i = 0; i < objs.size(); i++) {
 
 			//	// Translate through line
-			//	glm::vec2 end = lines.at(i)->getVertexEnd();
+			//	glm::vec2 end = lines.at(i)->getPoint2();
 				/*objs.at(0)->translateAlong(vec2(-1.3f,0.2f), 0.01f);
 				boxes.at(0)->translateAlong(vec2(-1.3f, 0.2f), 0.01f);*/
 

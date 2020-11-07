@@ -8,40 +8,35 @@ Util::Util()
 	srand((unsigned int)time(0));
 }
 
-glm::vec2 Util::getIntersectPoint2(const glm::vec2& v1, const glm::vec2& v2,
-								   const glm::vec2& v3, const glm::vec2& v4)
+float Util::ccw(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3)
 {
-	float increase1, constant1, sameValue1;
-	float increase2, constant2, sameValue2;
+	return (p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y);
+}
 
-	// Line 1
-	if (v1.x == v2.x)
-		sameValue1 = v1.x;
-	else {
-		increase1 = static_cast<float>((v2.y - v1.y) / (v2.x - v1.x));
-		constant1 = v1.y - increase1 * v1.x;
-	}
+bool Util::isIntersection(Line* line1, Line* line2)
+{
+	float l1_l2 = ccw(line1->getPoint1(), line1->getPoint2(), line2->getPoint1())
+		* ccw(line1->getPoint1(), line1->getPoint2(), line2->getPoint2());
+	float l2_l1 = ccw(line2->getPoint1(), line2->getPoint2(), line1->getPoint1())
+		* ccw(line2->getPoint1(), line2->getPoint2(), line1->getPoint2());
 
-	// Line 2
-	if (v3.x == v4.x)
-		sameValue2 = v3.x;
-	else {
-		increase2 = static_cast<float>((v4.y - v3.y) / (v4.x - v3.x));
-		constant2 = v3.y - increase2 * v3.x;
-	}
+	return (l1_l2 < 0) && (l2_l1 < 0);
+}
 
-	// IntersectPoint
-	glm::vec2 point;
-	if (v1.x == v2.x && v3.x == v4.x) return glm::vec2(-100.0f);
-	if (v1.x == v2.x)
-		point = glm::vec2(sameValue1, increase2 * sameValue1 + constant2);
-	else if (v3.x == v4.x)
-		point = glm::vec2(sameValue2, increase1 * sameValue2 + constant1);
-	else {
-		point.x = -(constant1 - constant2) / (increase1 - increase2);
-		point.y = increase1 * point.x + constant1;
-	}
-	return point;
+glm::vec2 Util::getIntersectPoint2(Line* line1, Line* line2)
+{
+	glm::vec2 p1 = line1->getPoint1(), p2 = line1->getPoint2();
+	glm::vec2 p3 = line2->getPoint1(), p4 = line2->getPoint2();
+
+	float x = ((p1.x * p2.y - p1.y * p2.x) * (p3.x - p4.x) 
+		- (p1.x - p2.x) * (p3.x * p4.y - p3.y * p4.x)) 
+		/ ((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x));
+
+	float y = ((p1.x * p2.y - p1.y * p2.x) * (p3.y - p4.y) 
+		- (p1.y - p2.y) * (p3.x * p4.y - p3.y * p4.x)) 
+		/ ((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x));
+
+	return glm::vec2(x, y);
 }
 
 float Util::generateFloat(float low, float high)

@@ -42,7 +42,6 @@ glm::vec2 Util::getIntersectPoint2(Line* line1, Line* line2)
 float Util::getPointPosition(const glm::vec2& p0, const glm::vec2& p1, const glm::vec2& p2)
 {
 	float ret = (p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x);
-	std::cout << ret << std::endl;
 
 	return ret;
 }
@@ -64,4 +63,32 @@ glm::vec2 Util::convert_xy(int x, int y)
 		static_cast<float>(height / 2);
 
 	return glm::vec2(pos_x, pos_y);
+}
+
+void Util::quickSort(std::vector<glm::vec2> &points, int begin, int end)
+{
+	if (begin < end)
+	{
+		int middle = (end - begin + 1) / 2;
+		glm::vec2 pivot = points.at(begin + middle);
+		int i = begin, j = end;
+
+		while (i <= j)
+		{
+			while (ccw(points[0], points[i], pivot) > 0.0f) i++;
+			while (ccw(points[0], pivot, points[j]) > 0.0f) j--;
+
+			if (i > j) break;
+
+			std::cout << points[i].x << std::endl;
+			std::cout << points[j].x << std::endl;
+			std::swap(points[i], points[j]);
+
+			i++;
+			j--;
+		}
+
+		quickSort(points, begin, j);
+		quickSort(points, i, end);
+	}
 }

@@ -14,6 +14,8 @@ private:
 	glm::mat4 worldTransform;
 
 	VertexArray* vertexArray;
+
+	bool FALL;
 	
 public:
 	Poly();
@@ -25,6 +27,8 @@ public:
 	int getVerticesSize() { return static_cast<int>(vertices.size()); }
 	
 	glm::vec2 getVertex2(int index);
+
+	void setFall() { FALL = true; }
 
 	void translateWorld(float x, float y);
 	void translateAlong(const glm::vec2& target, float speed);

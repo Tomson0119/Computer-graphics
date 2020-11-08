@@ -63,9 +63,12 @@ Poly::Poly(const std::vector<glm::vec2>& container)
 	for (int i = 0; i < vertices.size() - 2; i++)
 	{
 		indices.emplace_back(0);
-		indices.emplace_back(i+1);
-		indices.emplace_back(i+2);
+		indices.emplace_back(i + 1);
+		indices.emplace_back(i + 2);
 	}
+	for (int i = 0; i < indices.size(); i++)
+		std::cout << indices.at(i) << std::endl;
+
 	worldTransform = glm::mat4(1.0f);
 	pos = glm::vec2(0.0f);
 	setVertexArray();

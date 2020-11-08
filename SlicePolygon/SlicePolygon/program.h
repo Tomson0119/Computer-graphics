@@ -18,6 +18,7 @@ private:
 	Util* util;
 
 	std::vector<Poly*> objs;
+	std::vector<Poly*> pieces;
 	std::vector<Line*> lines;
 
 	Line* playerLine;
@@ -28,7 +29,7 @@ private:
 	int curr_time;
 	int delta_time;
 
-	void collision_event(Poly* obj);
+	bool collision_event(Poly* obj);
 	void slice_polygon(Poly* obj, glm::vec2 points[]);
 
 public:

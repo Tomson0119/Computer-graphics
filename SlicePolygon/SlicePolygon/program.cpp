@@ -23,6 +23,7 @@ Program::Program(int window_w, int window_h)
 	delta_time = 0;
 	
 	objs = std::vector<Poly*>();
+	pieces = std::vector<Poly*>();
 	lines = std::vector<Line*>();
 
 	playerLine = nullptr;
@@ -70,6 +71,11 @@ void Program::draw()
 	shader->setVec3("objectColor", vec3(1.0f, 0.0f, 0.0f));
 	for (unsigned int i = 0; i < objs.size(); i++)
 		objs.at(i)->draw(shader);
+
+	// pieces
+	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 1.0f));
+	for (unsigned int i = 0; i < pieces.size(); i++)
+		pieces.at(i)->draw(shader);
 }
 
 void Program::key_event(unsigned char key, int x, int y)
@@ -95,16 +101,18 @@ void Program::mouse_event(int button, int state, int x, int y)
 	else if (state == GLUT_UP)
 	{
 		// Collision check
-		for (unsigned int i = 0; i < objs.size(); i++)
+		int size = objs.size();
+		for (unsigned int i = 0; i < size; i++)
 		{
-			collision_event(objs.at(i));
+			if (collision_event(objs.at(i)))
+				objs.erase(objs.begin() + i);
 		}
 		
 		playerLine = nullptr;
 	}
 }
 
-void Program::collision_event(Poly* obj)
+bool Program::collision_event(Poly* obj)
 {
 	int size = obj->getVerticesSize();
 	int intersect = 0;
@@ -126,14 +134,14 @@ void Program::collision_event(Poly* obj)
 		if (intersect == 2) {
 			lines.push_back(new Line(points[0], points[1]));
 
-			std::cout << "Point : " << points[0].x << ", " << points[0].y;
+			std::cout << "Point : " << points[0].x << ", " << points[0].y << std::endl;
 			std::cout << "        " << points[1].x << ", " << points[1].y << std::endl;
 
 			slice_polygon(obj, points);
-			break;
+			return true;
 		}
 	}
-	
+	return false;	
 }
 
 void Program::slice_polygon(Poly* obj, glm::vec2 points[])
@@ -152,13 +160,17 @@ void Program::slice_polygon(Poly* obj, glm::vec2 points[])
 	}
 	left.push_back(points[0]);
 	left.push_back(points[1]);
+
 	right.push_back(points[0]);
 	right.push_back(points[1]);
 
-	for (unsigned int i = 0; i < left.size(); i++)
-		std::cout << "left : "<<left.at(i).x << " " << left.at(i).y << std::endl;
-	for (unsigned int i = 0; i < right.size(); i++)
-		std::cout << "right : " << right.at(i).x << " " << right.at(i).y << std::endl;
+	util->quickSort(left, 1, left.size() - 1);	
+	objs.push_back(new Poly(left));
+	objs.at(objs.size() - 1)->translateWorld(-0.3f, 0.0f);
+
+	util->quickSort(right, 1, right.size() - 1);
+	objs.push_back(new Poly(right));
+	objs.at(objs.size() - 1)->translateWorld(0.3f, 0.0f);
 }
 
 void Program::motion_event(int x, int y)

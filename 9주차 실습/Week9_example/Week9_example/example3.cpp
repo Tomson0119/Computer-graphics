@@ -127,9 +127,7 @@ void Example3::draw()
 		objs.at(5)->setWorldTranslate(x, objs.at(5)->getPos().y, z);
 		objs.at(5)->setWorldScale(0.05f);
 		objs.at(5)->draw(lightShader);
-	}
-
-	
+	}	
 
 	// Light Bulb
 	lampShader->use_program();

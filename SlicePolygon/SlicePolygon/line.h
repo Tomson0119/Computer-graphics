@@ -17,6 +17,7 @@ private:
 public:
 	Line(const glm::vec2& vec);
 	Line(const glm::vec2& begin, const glm::vec2& end);
+	Line(float x1, float y1, float x2, float y2);
 
 	~Line();
 

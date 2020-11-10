@@ -37,6 +37,23 @@ Line::Line(const glm::vec2& begin, const glm::vec2& end)
 	setVertexArray();
 }
 
+Line::Line(float x1, float y1, float x2, float y2)
+{
+	worldTransform = glm::mat4(1.0f);
+	vertexArray = nullptr;
+
+	vertices.emplace_back(glm::vec3(x1, y1, 0.0f));
+	vertices.emplace_back(glm::vec3(x2, y2, 0.0f));
+
+	normals.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	normals.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	indices.emplace_back(0);
+	indices.emplace_back(1);
+
+	setVertexArray();
+}
+
 Line::~Line()
 {
 	std::vector<glm::vec3>().swap(vertices);

@@ -23,7 +23,7 @@ Poly::Poly()
 	{
 		int rectangle = rand() % 2;
 		int index = rand() % 4;
-		std::cout << index << "th polygon created .." << std::endl;
+		
 		if (rectangle) {
 			vertices.emplace_back(glm::vec3(rect[index][0], 0.0f));
 			vertices.emplace_back(glm::vec3(rect[index][1], 0.0f));
@@ -54,8 +54,19 @@ Poly::Poly()
 
 Poly::Poly(const std::vector<glm::vec2>& container)
 {	
-	for (unsigned int i = 0; i < container.size(); i++)
+	float min_x = 100.0f, max_x = -100.0f, min_y = 100.0f, max_y = -100.0f;
+
+	for (unsigned int i = 0; i < container.size(); i++) {
 		vertices.push_back(glm::vec3(container.at(i), 0.0f));
+		if (min_x > container.at(i).x)
+			min_x = container.at(i).x;
+		if (max_x < container.at(i).x)
+			max_x = container.at(i).x;
+		if (min_y > container.at(i).y)
+			min_y = container.at(i).y;
+		if (max_y < container.at(i).y)
+			max_y = container.at(i).y;
+	}
 
 	for (unsigned int i = 0; i < vertices.size(); i++)
 		normals.emplace_back(glm::vec3(0.0f, 0.0f, 1.0f));
@@ -66,11 +77,9 @@ Poly::Poly(const std::vector<glm::vec2>& container)
 		indices.emplace_back(i + 1);
 		indices.emplace_back(i + 2);
 	}
-	for (int i = 0; i < indices.size(); i++)
-		std::cout << indices.at(i) << std::endl;
 
 	worldTransform = glm::mat4(1.0f);
-	pos = glm::vec2(0.0f);
+	pos = glm::vec2((max_x - min_x) / 2.0f, (max_y - min_y) / 2.0f);
 	setVertexArray();
 }
 

@@ -80,8 +80,6 @@ void Util::quickSort(std::vector<glm::vec2> &points, int begin, int end)
 
 			if (i > j) break;
 
-			std::cout << points[i].x << std::endl;
-			std::cout << points[j].x << std::endl;
 			std::swap(points[i], points[j]);
 
 			i++;

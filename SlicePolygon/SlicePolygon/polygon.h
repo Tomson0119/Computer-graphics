@@ -15,7 +15,6 @@ private:
 
 	VertexArray* vertexArray;
 
-	bool FALL;
 	
 public:
 	Poly();
@@ -25,13 +24,14 @@ public:
 	~Poly();
 
 	int getVerticesSize() { return static_cast<int>(vertices.size()); }
-	
+	glm::vec2 getPos() { return pos; }
 	glm::vec2 getVertex2(int index);
-
-	void setFall() { FALL = true; }
 
 	void translateWorld(float x, float y);
 	void translateAlong(const glm::vec2& target, float speed);
 	void setVertexArray();
 	void draw(Shader* shader);
+
+	bool FALL = false;
+	bool RIGHT = false;
 };

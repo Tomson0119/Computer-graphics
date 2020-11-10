@@ -21,7 +21,7 @@ Program::Program(int window_w, int window_h)
 	prev_time = 0;	
 	curr_time = 0;
 	delta_time = 0;
-	
+
 	objs = std::vector<Poly*>();
 	pieces = std::vector<Poly*>();
 	lines = std::vector<Line*>();
@@ -49,9 +49,10 @@ void Program::init()
 {
 	shader->make_shader("object.vs", "object.fs");
 
-	// for debug
-	objs.push_back(new Poly());
-	objs.at(objs.size() - 1)->translateWorld(0.0f, 0.3f);
+	// Insert New Object
+	/*objs.push_back(new Poly());
+	lines.push_back(new Line(vec2(0.0f)));
+	objs.at(objs.size() - 1)->translateWorld(0.0f, 0.5f);*/
 }
 
 void Program::draw()
@@ -102,12 +103,20 @@ void Program::mouse_event(int button, int state, int x, int y)
 	{
 		// Collision check
 		int size = objs.size();
-		for (unsigned int i = 0; i < size; i++)
+
+		std::vector<int> objIndices;
+		for (int i = 0; i < size; i++)
 		{
 			if (collision_event(objs.at(i)))
-				objs.erase(objs.begin() + i);
+				objIndices.push_back(i);
 		}
 		
+		for (unsigned int i = objIndices.size(); i > 0; i--) {
+			objs.erase(objs.begin() + objIndices.at(i - 1));
+			std::cout << i - 1 << "th polygon deleted" << std::endl;
+			lines.erase(lines.begin() + objIndices.at(i - 1));
+		}
+
 		playerLine = nullptr;
 	}
 }
@@ -132,10 +141,9 @@ bool Program::collision_event(Poly* obj)
 
 		// Delete polygon and push Two more polygon
 		if (intersect == 2) {
-			lines.push_back(new Line(points[0], points[1]));
-
-			std::cout << "Point : " << points[0].x << ", " << points[0].y << std::endl;
-			std::cout << "        " << points[1].x << ", " << points[1].y << std::endl;
+			// Sort points by y value
+			if (points[0].y > points[1].y)
+				std::swap(points[0], points[1]);
 
 			slice_polygon(obj, points);
 			return true;
@@ -166,11 +174,17 @@ void Program::slice_polygon(Poly* obj, glm::vec2 points[])
 
 	util->quickSort(left, 1, left.size() - 1);	
 	objs.push_back(new Poly(left));
-	objs.at(objs.size() - 1)->translateWorld(-0.3f, 0.0f);
+	std::cout << objs.size() - 1 <<"th polygon inserted"<< std::endl;
+	lines.push_back(new Line(vec2(0.0f)));
+	objs.at(objs.size() - 1)->FALL = true;
 
 	util->quickSort(right, 1, right.size() - 1);
 	objs.push_back(new Poly(right));
-	objs.at(objs.size() - 1)->translateWorld(0.3f, 0.0f);
+	std::cout << objs.size() - 1 << "th polygon inserted" << std::endl;
+	lines.push_back(new Line(vec2(0.0f)));
+	objs.at(objs.size() - 1)->FALL = true;
+	objs.at(objs.size() - 1)->RIGHT = true;
+
 }
 
 void Program::motion_event(int x, int y)
@@ -184,41 +198,43 @@ void Program::setTimer()
 	delta_time = curr_time - prev_time;
 
 	if (delta_time > 10) {
-		//for (unsigned int i = 0; i < objs.size(); i++) {
+		for (unsigned int i = 0; i < objs.size(); i++) {
+			
+			if (!objs.at(i)->FALL) {
+				//Translate through line
+				glm::vec2 end = lines.at(i)->getPoint2();
+				objs.at(i)->translateAlong(end, 0.01f);				
+			}
+			else {
+				if(objs.at(i)->RIGHT)
+					objs.at(i)->translateWorld(0.001f, -0.01f);
+				else
+					objs.at(i)->translateWorld(-0.001f, -0.01f);
+			}
 
-		//	// Translate through line
-		//	glm::vec2 end = lines.at(i)->getPoint2();
-			/*objs.at(0)->translateAlong(vec2(-1.3f,0.2f), 0.01f);
-			boxes.at(0)->translateAlong(vec2(-1.3f, 0.2f), 0.01f);*/
-
-			//	if (objs.at(i)->getPos().x < -1.3f) // Erase Object out of sight
-			//	{
-			//		objs.erase(objs.begin()); // Erase Object
-			//		boxes.erase(boxes.begin());
-			//		lines.erase(lines.begin()); // Erase Line					
-			//	}
-			//}			
+			if (objs.at(i)->getPos().x < -1.3f || objs.at(i)->getPos().y < -1.0f) // Erase Object out of sight
+			{
+				objs.erase(objs.begin() + i); // Erase Object
+				lines.erase(lines.begin() + i); // Erase Line					
+			}			
+		}			
 	}
 	if (delta_time > 2000)
 	{
-		//// Insert New Object
-		//objs.push_back(new Poly());
-		//glm::vec4 bb = dynamic_cast<Poly*>(objs.at(objs.size() - 1))->getBoundBox();
-		//boxes.push_back(new Poly(bb));
-		//
-		//// Insert Randomized Line
-		//float begin_y = util->generateFloat(0.2f, 0.8f);
-		//float end_y = util->generateFloat(0.2f, 0.8f);
+		// Insert New Object
+		objs.push_back(new Poly());
+		
+		// Insert Randomized Line
+		float begin_y = util->generateFloat(0.2f, 0.8f);
+		float end_y = util->generateFloat(0.2f, 0.8f);
 
-		//glm::vec2 begin = glm::vec2(1.3f, begin_y);
-		//glm::vec2 end = glm::vec2(-1.3f, end_y);
+		glm::vec2 begin = glm::vec2(1.3f, begin_y);
+		glm::vec2 end = glm::vec2(-1.3f, end_y);
 
-		//lines.push_back(new Line(begin, end));
+		lines.push_back(new Line(begin, end));
 
-		//// Translate Object To Up-Right
-		//objs.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
-		//boxes.at(objs.size() - 1)->setWorldTranslate(1.3f, begin_y, 0.0f);
-
+		// Translate Object To Up-Right
+		objs.at(objs.size() - 1)->translateWorld(1.3f, begin_y);
 		prev_time = curr_time;
 	}
 }

@@ -79,6 +79,7 @@ Poly::Poly(const std::vector<glm::vec2>& container)
 	}
 
 	worldTransform = glm::mat4(1.0f);
+	
 	pos = glm::vec2((max_x - min_x) / 2.0f, (max_y - min_y) / 2.0f);
 	setVertexArray();
 }
@@ -111,6 +112,12 @@ void Poly::translateAlong(const glm::vec2& target, float speed)
 	float y = dy / distance * speed;
 
 	translateWorld(x, y);
+}
+
+void Poly::translateToPos()
+{
+	worldTransform = glm::mat4(1.0f);
+	translateWorld(pos.x, pos.y);
 }
 
 void Poly::translateWorld(float x, float y)

@@ -17,14 +17,16 @@ Program::Program(int window_w, int window_h)
 	util = new Util();
 
 	polygon_mode = GL_FILL;
+	showLine = false;
+	move_speed = 0.01f;
 
 	prev_time = 0;	
 	curr_time = 0;
 	delta_time = 0;
 
 	objs = std::vector<Poly*>();
-	pieces = std::vector<Poly*>();
 	lines = std::vector<Line*>();
+	net = std::vector<Line*>();
 
 	playerLine = nullptr;
 }
@@ -39,6 +41,10 @@ Program::~Program()
 		delete line;
 	std::vector<Line*>().swap(lines);
 
+	for (Line* obj : net)
+		delete obj;
+	std::vector<Line*>().swap(net);
+
 	delete playerLine;
 	delete shader;
 	delete camera;
@@ -49,10 +55,31 @@ void Program::init()
 {
 	shader->make_shader("object.vs", "object.fs");
 
-	// Insert New Object
 	/*objs.push_back(new Poly());
-	lines.push_back(new Line(vec2(0.0f)));
-	objs.at(objs.size() - 1)->translateWorld(0.0f, 0.5f);*/
+	objs.at(objs.size() - 1)->translateWorld(0.0f, 0.5f);
+	std::cout << "pos : " << objs.at(objs.size() - 1)->getPos().x << "   " << objs.at(objs.size() - 1)->getPos().y << std::endl;*/
+
+	// Initialize 24 net lines
+	net.push_back(new Line(-1.3f, -0.4f, 1.3f, -0.4f));
+	net.push_back(new Line(-1.3f, -0.6f, 1.3f, -0.6f));
+	net.push_back(new Line(-1.3f, -0.8f, 1.3f, -0.8f));
+	net.push_back(new Line(0.0f, -0.4f, 0.0f, -1.0f));
+	net.push_back(new Line(-0.5f, -0.4f, -0.5f, -1.0f));
+	net.push_back(new Line(-0.75f, -0.4f, -0.75f, -1.0f));
+	net.push_back(new Line(-0.25f, -0.4f, -0.25f, -1.0f));
+	net.push_back(new Line(0.5f, -0.4f, 0.5f, -1.0f));
+	net.push_back(new Line(0.75f, -0.4f, 0.75f, -1.0f));
+	net.push_back(new Line(0.25f, -0.4f, 0.25f, -1.0f));
+
+	for (int i = 0; i < 24; i++)
+	{
+		float x_increse = 0.25f * (i % 8);
+		float y_increse = -0.2f * (i / 8);
+		poses[i].set(-0.875f + x_increse, -0.5f + y_increse);
+
+		if (i / 8 == 2)
+			poses[i].active = true;
+	}
 }
 
 void Program::draw()
@@ -61,22 +88,24 @@ void Program::draw()
 
 	// Player Line
 	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
-	if (playerLine != nullptr) playerLine->draw(shader);
-
-	// Lines
-	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
-	for (unsigned int i = 0; i < lines.size(); i++)
-		lines.at(i)->draw(shader);
+	if (playerLine != nullptr) playerLine->draw(shader);	
 
 	// Objects
 	shader->setVec3("objectColor", vec3(1.0f, 0.0f, 0.0f));
 	for (unsigned int i = 0; i < objs.size(); i++)
 		objs.at(i)->draw(shader);
 
-	// pieces
-	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 1.0f));
-	for (unsigned int i = 0; i < pieces.size(); i++)
-		pieces.at(i)->draw(shader);
+	// Lines
+	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
+	if (showLine) {
+		for (unsigned int i = 0; i < lines.size(); i++)
+			lines.at(i)->draw(shader);
+	}
+
+	// Net
+	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
+	for (unsigned int i = 0; i < net.size(); i++)
+		net.at(i)->draw(shader);
 }
 
 void Program::key_event(unsigned char key, int x, int y)
@@ -87,9 +116,21 @@ void Program::key_event(unsigned char key, int x, int y)
 		glutDestroyWindow(glutGetWindow());
 		exit(0);
 
-	case 'm': case 'M':
+	case 'm': case 'M': // Change Polygon Mode
 		polygon_mode = (polygon_mode == GL_FILL) ? GL_LINE : GL_FILL;
 		glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
+		break;
+
+	case 'o': case 'O': // Toggle showing lines
+		showLine = !showLine;
+		break;
+
+	case '+': case '=': // Increase moving speed of polygons
+		move_speed += 0.005f;
+		break;
+
+	case '-': case '_': // Decrese moving speed of polygons
+		if (move_speed > 0.01f) move_speed -= 0.005f;
 		break;
 	}
 }
@@ -99,18 +140,19 @@ void Program::mouse_event(int button, int state, int x, int y)
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
 		playerLine = new Line(util->convert_xy(x, y));
 
-	else if (state == GLUT_UP)
+	else if (state == GLUT_UP && button == GLUT_LEFT_BUTTON)
 	{
-		// Collision check
 		int size = objs.size();
-
 		std::vector<int> objIndices;
 		for (int i = 0; i < size; i++)
 		{
+			// Check collision for every polygon exists
+			// If collision happens, push index of polygon 
 			if (collision_event(objs.at(i)))
 				objIndices.push_back(i);
 		}
 		
+		// Erase polygons by backwards
 		for (unsigned int i = objIndices.size(); i > 0; i--) {
 			objs.erase(objs.begin() + objIndices.at(i - 1));
 			std::cout << i - 1 << "th polygon deleted" << std::endl;
@@ -127,6 +169,7 @@ bool Program::collision_event(Poly* obj)
 	int intersect = 0;
 	glm::vec2 points[2];
 
+	// Check collision for every line of polygon
 	for (int j = 0; j < size; j++)
 	{
 		Line line = Line(obj->getVertex2(j % size),
@@ -135,11 +178,10 @@ bool Program::collision_event(Poly* obj)
 		// Check if line crosses polygon
 		if (util->isIntersection(playerLine, &line))
 		{
-			// Get intersect point
+			// Get intersecting point
 			points[intersect++] = util->getIntersectPoint2(playerLine, &line);
 		}
 
-		// Delete polygon and push Two more polygon
 		if (intersect == 2) {
 			// Sort points by y value
 			if (points[0].y > points[1].y)
@@ -161,30 +203,37 @@ void Program::slice_polygon(Poly* obj, glm::vec2 points[])
 
 	for (int j = 0; j < size; j++)
 	{
+		// Check if points are counter-clock-wise
 		if (util->getPointPosition(points[0], points[1], obj->getVertex2(j)) > 0)
+			// if points are ccw, then these are left side
 			left.push_back(obj->getVertex2(j));
 		else
+			// if poitns are cw, these are right side
 			right.push_back(obj->getVertex2(j));
 	}
+
+	// Push intersecting points
 	left.push_back(points[0]);
 	left.push_back(points[1]);
-
 	right.push_back(points[0]);
 	right.push_back(points[1]);
 
+	// Sort vertexes ccw
 	util->quickSort(left, 1, left.size() - 1);	
-	objs.push_back(new Poly(left));
-	std::cout << objs.size() - 1 <<"th polygon inserted"<< std::endl;
-	lines.push_back(new Line(vec2(0.0f)));
-	objs.at(objs.size() - 1)->FALL = true;
-
 	util->quickSort(right, 1, right.size() - 1);
+
+	objs.push_back(new Poly(left));
+	//std::cout << objs.size() - 1 <<"th polygon inserted"<< std::endl;
+	lines.push_back(new Line(vec2(0.0f))); // Push temp line
+	objs.at(objs.size() - 1)->FALL = true;
+	std::cout << "pos : " << objs.at(objs.size() - 1)->getPos().x << "   " << objs.at(objs.size() - 1)->getPos().y << std::endl;
+	
 	objs.push_back(new Poly(right));
-	std::cout << objs.size() - 1 << "th polygon inserted" << std::endl;
-	lines.push_back(new Line(vec2(0.0f)));
+	//std::cout << objs.size() - 1 << "th polygon inserted" << std::endl;
+	lines.push_back(new Line(vec2(0.0f))); // Push temp line
 	objs.at(objs.size() - 1)->FALL = true;
 	objs.at(objs.size() - 1)->RIGHT = true;
-
+	std::cout << "pos : " << objs.at(objs.size() - 1)->getPos().x << "   " << objs.at(objs.size() - 1)->getPos().y << std::endl;
 }
 
 void Program::motion_event(int x, int y)
@@ -200,23 +249,40 @@ void Program::setTimer()
 	if (delta_time > 10) {
 		for (unsigned int i = 0; i < objs.size(); i++) {
 			
-			if (!objs.at(i)->FALL) {
-				//Translate through line
+			if (!objs.at(i)->FALL) { // If it's not piece
+				//Translate along the line
 				glm::vec2 end = lines.at(i)->getPoint2();
-				objs.at(i)->translateAlong(end, 0.01f);				
+				objs.at(i)->translateAlong(end, move_speed);				
 			}
-			else {
+			else if(!objs.at(i)->FIXED) // Falling pieces
+			{ 
 				if(objs.at(i)->RIGHT)
 					objs.at(i)->translateWorld(0.001f, -0.01f);
 				else
 					objs.at(i)->translateWorld(-0.001f, -0.01f);
+
+				// Put polygons inside the net
+				// if polygon's pos is inside of net position
+				int target = isInside(objs.at(i));
+				// do translate polygon to position
+				if (target >= 0)
+				{
+					std::cout << "collision ! : "<<target<<std::endl;
+					std::cout << poses[target].pos_x <<"   "<< poses[target].pos_y << std::endl;
+					vec2 end = vec2(poses[target].pos_x, poses[target].pos_y);
+					objs.at(i)->translateWorld(poses[target].pos_x - objs.at(i)->getPos().x,
+						poses[target].pos_y - objs.at(i)->getPos().y);
+					objs.at(i)->FIXED = true;
+					poses[target].active = false;
+				}
 			}
 
 			if (objs.at(i)->getPos().x < -1.3f || objs.at(i)->getPos().y < -1.0f) // Erase Object out of sight
 			{
+				std::cout << "erased!" << std::endl;
 				objs.erase(objs.begin() + i); // Erase Object
 				lines.erase(lines.begin() + i); // Erase Line					
-			}			
+			}
 		}			
 	}
 	if (delta_time > 2000)
@@ -237,5 +303,27 @@ void Program::setTimer()
 		objs.at(objs.size() - 1)->translateWorld(1.3f, begin_y);
 		prev_time = curr_time;
 	}
+}
+
+int Program::isInside(Poly* obj)
+{
+	for (int i = 0; i < sizeof(poses) / sizeof(poses[0]); i++)
+	{
+		if (poses[i].active)
+		{
+			// Get Boundaries
+			float min_x = poses[i].pos_x - 0.125f;
+			float max_x = poses[i].pos_x + 0.125f;
+			float min_y = poses[i].pos_y - 0.125f;
+			float max_y = poses[i].pos_y + 0.125f;
+
+			float x = obj->getPos().x;
+			float y = obj->getPos().y;
+
+			if (x > min_x && x < max_x && y > min_y && y < max_y)
+				return i;
+		}
+	}
+	return -1;
 }
 

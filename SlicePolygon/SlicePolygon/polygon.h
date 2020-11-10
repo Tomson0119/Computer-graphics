@@ -14,7 +14,6 @@ private:
 	glm::mat4 worldTransform;
 
 	VertexArray* vertexArray;
-
 	
 public:
 	Poly();
@@ -23,15 +22,19 @@ public:
 
 	~Poly();
 
+	void setPos(glm::vec2 vec) { pos = vec; }
+
 	int getVerticesSize() { return static_cast<int>(vertices.size()); }
 	glm::vec2 getPos() { return pos; }
 	glm::vec2 getVertex2(int index);
 
+	void translateToPos();
 	void translateWorld(float x, float y);
 	void translateAlong(const glm::vec2& target, float speed);
 	void setVertexArray();
 	void draw(Shader* shader);
 
+	bool FIXED = false;
 	bool FALL = false;
 	bool RIGHT = false;
 };

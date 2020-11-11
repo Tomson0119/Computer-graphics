@@ -47,6 +47,9 @@ Poly::Poly()
 		}
 	}
 
+	min_x = 0.0f, max_x = 0.0f;
+	min_y = 0.0f, max_y = 0.0f;
+
 	worldTransform = glm::mat4(1.0f);
 	pos = glm::vec2(0.0f);
 	setVertexArray();
@@ -54,16 +57,19 @@ Poly::Poly()
 
 Poly::Poly(const std::vector<glm::vec2>& container)
 {	
-	float min_x = 100.0f, max_x = -100.0f, min_y = 100.0f, max_y = -100.0f;
+	min_x = 100.0f, max_x = -100.0f, min_y = 100.0f, max_y = -100.0f;
 
 	for (unsigned int i = 0; i < container.size(); i++) {
 		vertices.push_back(glm::vec3(container.at(i), 0.0f));
 		if (min_x > container.at(i).x)
 			min_x = container.at(i).x;
+
 		if (max_x < container.at(i).x)
 			max_x = container.at(i).x;
+
 		if (min_y > container.at(i).y)
 			min_y = container.at(i).y;
+
 		if (max_y < container.at(i).y)
 			max_y = container.at(i).y;
 	}
@@ -80,7 +86,8 @@ Poly::Poly(const std::vector<glm::vec2>& container)
 
 	worldTransform = glm::mat4(1.0f);
 	
-	pos = glm::vec2((max_x - min_x) / 2.0f, (max_y - min_y) / 2.0f);
+	first_pos = glm::vec2((max_x - min_x) / 2.0f + min_x, (max_y - min_y) / 2.0f + min_y);
+	pos = glm::vec2((max_x - min_x) / 2.0f + min_x, (max_y - min_y) / 2.0f + min_y);
 	setVertexArray();
 }
 
@@ -114,10 +121,17 @@ void Poly::translateAlong(const glm::vec2& target, float speed)
 	translateWorld(x, y);
 }
 
-void Poly::translateToPos()
+void Poly::scaleWorld(float x, float y)
 {
-	worldTransform = glm::mat4(1.0f);
-	translateWorld(pos.x, pos.y);
+	float a = pos.x, b = pos.y;
+	//translateWorld(pos.x, pos.y);
+	//std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
+	//worldTransform = glm::mat4(1.0f);
+	//worldTransform = glm::translate(worldTransform, glm::vec3(-first_pos.x, -first_pos.y, 0.0f));
+	worldTransform = glm::scale(worldTransform, glm::vec3(0.7f, 0.7f, 1.0f));
+	translateWorld(-a, -b);
+	//worldTransform = glm::translate(worldTransform, glm::vec3(first_pos.x, first_pos.y, 0.0f));
+	//worldTransform = glm::translate(worldTransform, glm::vec3(pos.x, pos.y, 0.0f));
 }
 
 void Poly::translateWorld(float x, float y)

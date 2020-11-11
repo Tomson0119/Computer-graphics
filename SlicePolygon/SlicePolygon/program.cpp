@@ -28,6 +28,10 @@ Program::Program(int window_w, int window_h)
 	lines = std::vector<Line*>();
 	net = std::vector<Line*>();
 
+	// debug
+	temp = std::vector<Line*>();
+
+	captured = nullptr;
 	playerLine = nullptr;
 }
 
@@ -45,6 +49,12 @@ Program::~Program()
 		delete obj;
 	std::vector<Line*>().swap(net);
 
+	// debug
+	for (Line* obj : temp)
+		delete obj;
+	std::vector<Line*>().swap(temp);
+
+	delete captured;
 	delete playerLine;
 	delete shader;
 	delete camera;
@@ -54,10 +64,6 @@ Program::~Program()
 void Program::init()
 {
 	shader->make_shader("object.vs", "object.fs");
-
-	/*objs.push_back(new Poly());
-	objs.at(objs.size() - 1)->translateWorld(0.0f, 0.5f);
-	std::cout << "pos : " << objs.at(objs.size() - 1)->getPos().x << "   " << objs.at(objs.size() - 1)->getPos().y << std::endl;*/
 
 	// Initialize 24 net lines
 	net.push_back(new Line(-1.3f, -0.4f, 1.3f, -0.4f));
@@ -106,6 +112,11 @@ void Program::draw()
 	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
 	for (unsigned int i = 0; i < net.size(); i++)
 		net.at(i)->draw(shader);
+
+	// debug
+	shader->setVec3("objectColor", vec3(0.0f, 0.0f, 0.0f));
+	for (unsigned int i = 0; i < temp.size(); i++)
+		temp.at(i)->draw(shader);
 }
 
 void Program::key_event(unsigned char key, int x, int y)
@@ -137,11 +148,42 @@ void Program::key_event(unsigned char key, int x, int y)
 
 void Program::mouse_event(int button, int state, int x, int y)
 {
-	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
-		playerLine = new Line(util->convert_xy(x, y));
+	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
+		vec2 mouse_pos = util->convert_xy(x, y);
+		
+		if(mouse_pos.y > -0.4f) // Create line above the -0.4f
+			playerLine = new Line(util->convert_xy(x, y));
+		else
+		{
+			std::cout << "clicked!" << std::endl;
+
+			int index = isInside(mouse_pos, false);
+			vec2 target = vec2(poses[index].pos_x, poses[index].pos_y);
+			std::cout << "index : " << index << std::endl;
+			std::cout << "mouse pos : " << mouse_pos.x << ", " << mouse_pos.y << std::endl;
+			std::cout << "target pos : " << target.x << ", " << target.y << std::endl;
+
+			for (unsigned int i = 0; i < objs.size(); i++)
+			{
+				vec2 objPos = objs.at(i)->getPos();
+		
+				if (objPos.x == target.x && objPos.y == target.y) {
+					captured = objs.at(i);
+					std::cout << "captured!" << std::endl;
+				}
+			}			
+		}
+	}
 
 	else if (state == GLUT_UP && button == GLUT_LEFT_BUTTON)
 	{
+		if (playerLine == nullptr)
+		{
+			captured = nullptr;
+			// do collision check
+			return;
+		}
+
 		int size = objs.size();
 		std::vector<int> objIndices;
 		for (int i = 0; i < size; i++)
@@ -223,22 +265,25 @@ void Program::slice_polygon(Poly* obj, glm::vec2 points[])
 	util->quickSort(right, 1, right.size() - 1);
 
 	objs.push_back(new Poly(left));
-	//std::cout << objs.size() - 1 <<"th polygon inserted"<< std::endl;
 	lines.push_back(new Line(vec2(0.0f))); // Push temp line
 	objs.at(objs.size() - 1)->FALL = true;
-	std::cout << "pos : " << objs.at(objs.size() - 1)->getPos().x << "   " << objs.at(objs.size() - 1)->getPos().y << std::endl;
 	
 	objs.push_back(new Poly(right));
-	//std::cout << objs.size() - 1 << "th polygon inserted" << std::endl;
 	lines.push_back(new Line(vec2(0.0f))); // Push temp line
 	objs.at(objs.size() - 1)->FALL = true;
 	objs.at(objs.size() - 1)->RIGHT = true;
-	std::cout << "pos : " << objs.at(objs.size() - 1)->getPos().x << "   " << objs.at(objs.size() - 1)->getPos().y << std::endl;
 }
 
 void Program::motion_event(int x, int y)
 {
-	playerLine->changePos(util->convert_xy(x, y));
+	vec2 mouse_pos = util->convert_xy(x, y);
+	if (playerLine != nullptr && mouse_pos.y > -0.4f)
+		playerLine->changePos(mouse_pos);
+	else
+	{
+		if (captured != nullptr)
+			captured->translateAlong(mouse_pos, move_speed);
+	}
 }
 
 void Program::setTimer()
@@ -247,6 +292,7 @@ void Program::setTimer()
 	delta_time = curr_time - prev_time;
 
 	if (delta_time > 10) {
+		
 		for (unsigned int i = 0; i < objs.size(); i++) {
 			
 			if (!objs.at(i)->FALL) { // If it's not piece
@@ -256,24 +302,36 @@ void Program::setTimer()
 			}
 			else if(!objs.at(i)->FIXED) // Falling pieces
 			{ 
-				if(objs.at(i)->RIGHT)
+				if (objs.at(i)->RIGHT)
 					objs.at(i)->translateWorld(0.001f, -0.01f);
 				else
 					objs.at(i)->translateWorld(-0.001f, -0.01f);
 
 				// Put polygons inside the net
 				// if polygon's pos is inside of net position
-				int target = isInside(objs.at(i));
+				int target = isInside(objs.at(i)->getPos(), true);
+
 				// do translate polygon to position
 				if (target >= 0)
 				{
-					std::cout << "collision ! : "<<target<<std::endl;
-					std::cout << poses[target].pos_x <<"   "<< poses[target].pos_y << std::endl;
-					vec2 end = vec2(poses[target].pos_x, poses[target].pos_y);
+					vec2 end = vec2(poses[target].pos_x, poses[target].pos_y);					
+					
 					objs.at(i)->translateWorld(poses[target].pos_x - objs.at(i)->getPos().x,
 						poses[target].pos_y - objs.at(i)->getPos().y);
+
+					//objs.at(i)->scaleWorld(poses[target].pos_x, poses[target].pos_y);
+
+					// debug
+					for (int j = 0; j < objs.at(i)->getVerticesSize(); j++)
+					{
+						temp.push_back(new Line(objs.at(i)->getPos(), objs.at(i)->getVertex2(j)));
+					}
+					
+					// have to scale it
+					
 					objs.at(i)->FIXED = true;
 					poses[target].active = false;
+					if (target >= 8) poses[target - 8].active = true;
 				}
 			}
 
@@ -305,11 +363,12 @@ void Program::setTimer()
 	}
 }
 
-int Program::isInside(Poly* obj)
+int Program::isInside(glm::vec2 position, bool checkActive)
 {
 	for (int i = 0; i < sizeof(poses) / sizeof(poses[0]); i++)
 	{
-		if (poses[i].active)
+		bool Active = (checkActive) ? poses[i].active : true;
+		if (Active)
 		{
 			// Get Boundaries
 			float min_x = poses[i].pos_x - 0.125f;
@@ -317,13 +376,9 @@ int Program::isInside(Poly* obj)
 			float min_y = poses[i].pos_y - 0.125f;
 			float max_y = poses[i].pos_y + 0.125f;
 
-			float x = obj->getPos().x;
-			float y = obj->getPos().y;
-
-			if (x > min_x && x < max_x && y > min_y && y < max_y)
+			if (position.x > min_x && position.x < max_x && position.y > min_y && position.y < max_y)
 				return i;
 		}
 	}
 	return -1;
 }
-

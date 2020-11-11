@@ -25,6 +25,7 @@ private:
 			active = false;
 		}
 	};
+	Position poses[24];
 
 	Shader* shader;
 	Camera* camera;
@@ -34,24 +35,28 @@ private:
 	std::vector<Line*> lines;
 	std::vector<Line*> net;
 
-	Line* playerLine;
+	// For debug
+	std::vector<Line*> temp;
 
-	Position poses[24];
+	Poly* captured;
+	Line* playerLine;	
 
 	unsigned int polygon_mode;
 	bool showLine;
 	float move_speed;
+	
 
 	int prev_time;
 	int curr_time;
 	int delta_time;
+
 
 	// Slice collision functions
 	bool collision_event(Poly* obj);
 	void slice_polygon(Poly* obj, glm::vec2 points[]);
 
 	// Net collision functions
-	int isInside(Poly* obj);
+	int isInside(glm::vec2 position, bool checkActive);
 
 public:
 	Program(int window_w, int window_h);

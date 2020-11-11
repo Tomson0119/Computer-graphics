@@ -4,12 +4,9 @@
 Line::Line(const glm::vec2& vec)
 {
 	worldTransform = glm::mat4(1.0f);
-	vertexArray = nullptr;
-
-	glm::vec3 pos = glm::vec3(vec, 0.0f);
 	
-	vertices.emplace_back(pos);
-	vertices.emplace_back(pos);
+	vertices.emplace_back(glm::vec3(vec, 0.0f));
+	vertices.emplace_back(glm::vec3(vec, 0.0f));
 
 	normals.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	normals.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -23,7 +20,6 @@ Line::Line(const glm::vec2& vec)
 Line::Line(const glm::vec2& begin, const glm::vec2& end)
 {
 	worldTransform = glm::mat4(1.0f);
-	vertexArray = nullptr;
 
 	vertices.emplace_back(glm::vec3(begin, 0.0f));
 	vertices.emplace_back(glm::vec3(end, 0.0f));
@@ -40,7 +36,6 @@ Line::Line(const glm::vec2& begin, const glm::vec2& end)
 Line::Line(float x1, float y1, float x2, float y2)
 {
 	worldTransform = glm::mat4(1.0f);
-	vertexArray = nullptr;
 
 	vertices.emplace_back(glm::vec3(x1, y1, 0.0f));
 	vertices.emplace_back(glm::vec3(x2, y2, 0.0f));
@@ -65,6 +60,7 @@ Line::~Line()
 
 void Line::changePos(const glm::vec2& pos)
 {
+	// changed last vertex and update vertex array
 	vertices.at(1) = glm::vec3(pos, 0.0f);
 	setVertexArray();
 }

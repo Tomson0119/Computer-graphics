@@ -6,6 +6,7 @@
 
 Poly::Poly()
 {
+	// Initialized triangle vertices
 	glm::vec2 tri[4][3] = {
 		{ glm::vec2(0.0f,  0.15f), glm::vec2(-0.15f, -0.15f), glm::vec2(0.15f, -0.15f) },
 		{ glm::vec2(-0.2f,  0.05f), glm::vec2(0.10f, -0.15f), glm::vec2(0.10f,  0.13f) }, 
@@ -13,6 +14,7 @@ Poly::Poly()
 		{ glm::vec2(0.21f, 0.13f), glm::vec2(-0.13f, -0.10f), glm::vec2(0.13f, -0.10f) }
 	};
 
+	// Initialized rectangle vertices
 	glm::vec2 rect[4][4] = {
 		{ glm::vec2(-0.15f, 0.15f), glm::vec2(-0.16f, -0.15f), glm::vec2(0.14f, -0.14f), glm::vec2(0.15f, 0.16f) },
 		{ glm::vec2(-0.12f, 0.13f), glm::vec2(-0.15f, -0.15f), glm::vec2(0.18f, -0.15f), glm::vec2(0.11f, 0.13f) },
@@ -47,9 +49,6 @@ Poly::Poly()
 		}
 	}
 
-	min_x = 0.0f, max_x = 0.0f;
-	min_y = 0.0f, max_y = 0.0f;
-
 	worldTransform = glm::mat4(1.0f);
 	pos = glm::vec2(0.0f);
 	setVertexArray();
@@ -57,19 +56,19 @@ Poly::Poly()
 
 Poly::Poly(const std::vector<glm::vec2>& container)
 {	
-	min_x = 100.0f, max_x = -100.0f, min_y = 100.0f, max_y = -100.0f;
+	float min_x = 100.0f, max_x = -100.0f, min_y = 100.0f, max_y = -100.0f;
 
-	for (unsigned int i = 0; i < container.size(); i++) {
+	for (unsigned int i = 0; i < container.size(); i++) 
+	{
 		vertices.push_back(glm::vec3(container.at(i), 0.0f));
+
+		// get boundary
 		if (min_x > container.at(i).x)
 			min_x = container.at(i).x;
-
 		if (max_x < container.at(i).x)
 			max_x = container.at(i).x;
-
 		if (min_y > container.at(i).y)
 			min_y = container.at(i).y;
-
 		if (max_y < container.at(i).y)
 			max_y = container.at(i).y;
 	}
@@ -86,7 +85,7 @@ Poly::Poly(const std::vector<glm::vec2>& container)
 
 	worldTransform = glm::mat4(1.0f);
 	
-	first_pos = glm::vec2((max_x - min_x) / 2.0f + min_x, (max_y - min_y) / 2.0f + min_y);
+	// set centre pos to middle of the boundary 
 	pos = glm::vec2((max_x - min_x) / 2.0f + min_x, (max_y - min_y) / 2.0f + min_y);
 	setVertexArray();
 }
@@ -123,27 +122,23 @@ void Poly::translateAlong(const glm::vec2& target, float speed)
 
 void Poly::scaleWorld(float x, float y)
 {
-	float a = pos.x, b = pos.y;
-	//translateWorld(pos.x, pos.y);
-	//std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
-	//worldTransform = glm::mat4(1.0f);
-	//worldTransform = glm::translate(worldTransform, glm::vec3(-first_pos.x, -first_pos.y, 0.0f));
-	worldTransform = glm::scale(worldTransform, glm::vec3(0.7f, 0.7f, 1.0f));
-	translateWorld(-a, -b);
-	//worldTransform = glm::translate(worldTransform, glm::vec3(first_pos.x, first_pos.y, 0.0f));
-	//worldTransform = glm::translate(worldTransform, glm::vec3(pos.x, pos.y, 0.0f));
+	// Failed to implement
 }
 
 void Poly::translateWorld(float x, float y)
 {
+	// update vertices and position
 	for (unsigned int i = 0; i < vertices.size(); i++)
 		vertices.at(i) += glm::vec3(x, y, 0.0f);
 	pos += glm::vec2(x, y);
+
+	// Translate world matrix
 	worldTransform = glm::translate(worldTransform, glm::vec3(x, y, 0.0f));
 }
 
 void Poly::setVertexArray()
 {
+	// set vertex buffer
 	vertexArray = new VertexArray(vertices, normals, indices);
 }
 

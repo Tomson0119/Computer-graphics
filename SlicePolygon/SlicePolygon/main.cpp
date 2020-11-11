@@ -75,7 +75,8 @@ GLvoid mouse_motion(int x, int y)
 
 GLvoid setTimer(int value)
 {
-	game.setTimer();
-	glutPostRedisplay();
-	glutTimerFunc(16, setTimer, 1);	
+	if(game.setTimer())
+		// if game is not ended continue timer
+		glutTimerFunc(16, setTimer, 1);
+	glutPostRedisplay();	
 }

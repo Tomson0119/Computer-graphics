@@ -9,7 +9,7 @@
 
 // Basig elements
 Util util = Util(1200, 900);
-Example3 example = Example3(util.getWindowWidth(), util.getWinodwHeight());
+Example2 example = Example2(util.getWindowWidth(), util.getWinodwHeight());
 
 
 //Callback functions

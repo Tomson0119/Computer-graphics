@@ -78,5 +78,5 @@ GLvoid setTimer(int value)
 	if(game.setTimer())
 		// if game is not ended continue timer
 		glutTimerFunc(16, setTimer, 1);
-	glutPostRedisplay();	
+	glutPostRedisplay();
 }
